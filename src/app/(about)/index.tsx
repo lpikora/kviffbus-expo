@@ -11,7 +11,7 @@ import { WebBadge } from "@/components/web-badge";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
-export default function TabTwoScreen() {
+export default function AboutScreen() {
   const safeAreaInsets = useSafeAreaInsets();
   const insets = {
     ...safeAreaInsets,
@@ -40,15 +40,15 @@ export default function TabTwoScreen() {
     >
       <ThemedView style={styles.container}>
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
+          <ThemedText type="subtitle">O aplikaci</ThemedText>
           <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{"\n"}code to help you get started.
+            KviffBus — vyhledávání autobusových spojení
           </ThemedText>
 
           <ExternalLink href="https://docs.expo.dev" asChild>
             <Pressable style={({ pressed }) => pressed && styles.pressed}>
               <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
+                <ThemedText type="link">Expo dokumentace</ThemedText>
                 <SymbolView
                   tintColor={theme.text}
                   name={{
@@ -67,8 +67,10 @@ export default function TabTwoScreen() {
           <Collapsible title="File-based routing">
             <ThemedText type="small">
               This app has two screens:{" "}
-              <ThemedText type="code">src/app/index.tsx</ThemedText> and{" "}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
+              <ThemedText type="code">
+                src/app/(connection)/index.tsx
+              </ThemedText>{" "}
+              and <ThemedText type="code">src/app/(about)/index.tsx</ThemedText>
             </ThemedText>
             <ThemedText type="small">
               The layout file in{" "}
