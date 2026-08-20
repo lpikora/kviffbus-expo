@@ -23,13 +23,25 @@ export class ConnectionService {
     connections: ConnectionDto[],
     stops: StopDto[],
     exceptions: StopExceptionDto[],
-    appConfig: AppConfigDto,
+    appConfig: AppConfigDto | null,
     params: SearchParams,
   ): ConnectionDto[] {
     const { fromStop, toStop, departureDateTime: depTime } = params;
 
     if (!fromStop || !toStop) {
-      return [];
+      throw new Error("fromStop or toStop is null");
+    }
+    if (!appConfig) {
+      throw new Error("appConfig is null");
+    }
+    if (stops.length === 0) {
+      throw new Error("stops is empty");
+    }
+    if (exceptions.length === 0) {
+      throw new Error("exceptions is empty");
+    }
+    if (connections.length === 0) {
+      throw new Error("connections is empty");
     }
 
     const departureDateTime =

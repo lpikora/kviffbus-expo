@@ -9,9 +9,16 @@ import {
 } from "@/types/departureDateTimeType";
 import { StopDto } from "@/types/stopDto";
 import { StopExceptionDto } from "@/types/stopExceptionDto";
+import Constants from "expo-constants";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+
+const APP_BUILD_NUMBER = Number(
+  Constants.expoConfig?.android?.versionCode ??
+    Constants.expoConfig?.ios?.buildNumber ??
+    1,
+);
 
 export interface StopsStoreState {
   fromStop: StopDto | null;
@@ -21,8 +28,10 @@ export interface StopsStoreState {
   stopExceptions: StopExceptionDto[];
   departureDateTime: DepartureDateTimeType;
   results: ConnectionDto[];
-  appConfig: AppConfigDto;
+  appConfig: AppConfigDto | null;
   searchCount: number;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export interface StopsStoreActions {
@@ -39,6 +48,7 @@ export interface StopsStoreActions {
   incrementSearchCount: () => void;
   swapStops: () => void;
   syncWithApi: () => Promise<void>;
+  initData: () => Promise<void>;
   searchConnections: () => void;
   reset: () => void;
 }
@@ -46,16 +56,18 @@ export type StopsStore = StopsStoreState & StopsStoreActions;
 export const stopsStoreDefaultValues: StopsStoreState = {
   fromStop: null,
   toStop: null,
-  stops: DataService.getLocalData().stops,
-  connections: DataService.getLocalData().connections,
-  stopExceptions: DataService.getLocalData().stopExceptions,
+  stops: [],
+  connections: [],
+  stopExceptions: [],
   departureDateTime: {
     type: TypeOfDepartureDateTimeType.now,
     date: null,
   },
   results: [],
-  appConfig: DataService.getLocalData().appConfig,
+  appConfig: null,
   searchCount: 0,
+  isLoading: false,
+  error: null,
 };
 export const useRootStore = create<StopsStore>()(
   persist(
@@ -88,10 +100,11 @@ export const useRootStore = create<StopsStore>()(
           return;
         }
         try {
-          const remoteData = await DataService.fetchLatestData();
+          const remoteData = await DataService.getRemoteData();
           const { appConfig: currentAppConfig } = get();
 
           if (
+            currentAppConfig !== null &&
             remoteData.appConfig.importVersion <= currentAppConfig.importVersion
           ) {
             return;
@@ -110,6 +123,26 @@ export const useRootStore = create<StopsStore>()(
           );
         }
       },
+      initData: async () => {
+        const { connections } = get();
+        if (connections.length > 0) {
+          return;
+        }
+        set({ error: null });
+        try {
+          const localData = await DataService.getLocalData();
+
+          set({
+            stops: localData.stops,
+            connections: localData.connections,
+            stopExceptions: localData.stopExceptions,
+            appConfig: localData.appConfig,
+          });
+        } catch (error) {
+          set({ error: "Nastala chyba při načítání dat" });
+          console.warn("Offline/Data load failed", error);
+        }
+      },
       searchConnections: () => {
         const {
           fromStop,
@@ -121,35 +154,36 @@ export const useRootStore = create<StopsStore>()(
           appConfig,
         } = get();
 
-        const results = ConnectionService.searchConnections(
-          connections,
-          stops,
-          stopExceptions,
-          appConfig,
-          {
-            fromStop,
-            toStop,
-            departureDateTime,
-          },
-        );
+        set({ isLoading: true, error: null });
+        try {
+          const results = ConnectionService.searchConnections(
+            connections,
+            stops,
+            stopExceptions,
+            appConfig,
+            {
+              fromStop,
+              toStop,
+              departureDateTime,
+            },
+          );
 
-        set({ results });
+          set({ results });
+        } catch (error) {
+          // TODO localize
+          set({ error: "Nastala chyba při hledání spojů. " });
+          console.warn("Error in searchConnections", error);
+        } finally {
+          set({ isLoading: false });
+        }
       },
       reset: () => set(stopsStoreDefaultValues),
     }),
     {
       name: "kviffbus-store",
+      version: APP_BUILD_NUMBER,
       storage: createJSONStorage(() => clientStorage),
       partialize: (state) => {
-        if (__DEV__) {
-          // In DEV mode: Only persist user-selected values (excluding heavy/static dataset keys)
-          return {
-            fromStop: state.fromStop,
-            toStop: state.toStop,
-          };
-        }
-
-        // In PRODUCTION: Persist everything including dataset keys
         return {
           stops: state.stops,
           connections: state.connections,
