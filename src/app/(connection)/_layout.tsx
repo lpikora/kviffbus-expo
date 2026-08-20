@@ -11,7 +11,6 @@ export default function ConnectionLayout() {
           presentation: "modal",
           title: "Vybrat zastávku",
           sheetGrabberVisible: true,
-          sheetAllowedDetents: [0.5, 1.0],
           headerTransparent: true,
           contentStyle: { backgroundColor: "transparent" },
         }}

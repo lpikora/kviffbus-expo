@@ -5,13 +5,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { useTranslation } from "react-i18next";
 
 export default function ConnectionScreen() {
+  const { t } = useTranslation();
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedText type="title" style={styles.title}>
-          Vyhledat spoj
+          {t("HomeScreen.title")}
         </ThemedText>
 
         {/* Stop selectors */}
@@ -21,9 +24,11 @@ export default function ConnectionScreen() {
             onPress={() => router.push("/stop-picker?field=from")}
           >
             <ThemedText themeColor="textSecondary" type="small">
-              Odkud
+              {t("StopTextInput.from")}
             </ThemedText>
-            <ThemedText type="defaultBold">Vybrat zastávku…</ThemedText>
+            <ThemedText type="defaultBold">
+              {t("StopTextInput.selectStop")}
+            </ThemedText>
           </Pressable>
 
           <ThemedView style={styles.divider} />
@@ -33,9 +38,11 @@ export default function ConnectionScreen() {
             onPress={() => router.push("/stop-picker?field=to")}
           >
             <ThemedText themeColor="textSecondary" type="small">
-              Kam
+              {t("StopTextInput.to")}
             </ThemedText>
-            <ThemedText type="defaultBold">Vybrat zastávku…</ThemedText>
+            <ThemedText type="defaultBold">
+              {t("SearchButton.search")}
+            </ThemedText>
           </Pressable>
         </ThemedView>
 
@@ -44,7 +51,7 @@ export default function ConnectionScreen() {
           style={({ pressed }) => [styles.mapButton, pressed && styles.pressed]}
           onPress={() => router.push("/map")}
         >
-          <ThemedText type="link">Zobrazit mapu</ThemedText>
+          <ThemedText type="link">{t("HomeScreen.mapButton")}</ThemedText>
         </Pressable>
 
         {/* Search button */}
@@ -64,7 +71,7 @@ export default function ConnectionScreen() {
             style={styles.searchButtonText}
             type={Platform.OS === "web" ? "defaultBold" : "defaultBold"}
           >
-            Hledat spoj
+            {t("SearchButton.search")}
           </ThemedText>
         </Pressable>
       </SafeAreaView>
