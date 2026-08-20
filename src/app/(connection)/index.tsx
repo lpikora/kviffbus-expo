@@ -5,10 +5,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { useRootStore } from "@/stores/rootStore";
 import { useTranslation } from "react-i18next";
 
 export default function ConnectionScreen() {
   const { t } = useTranslation();
+  const fromStop = useRootStore((state) => state.fromStop);
+  const toStop = useRootStore((state) => state.toStop);
 
   return (
     <ThemedView style={styles.container}>
@@ -27,7 +30,7 @@ export default function ConnectionScreen() {
               {t("StopTextInput.from")}
             </ThemedText>
             <ThemedText type="defaultBold">
-              {t("StopTextInput.selectStop")}
+              {fromStop ? fromStop.name : t("StopTextInput.selectStop")}
             </ThemedText>
           </Pressable>
 
@@ -41,7 +44,7 @@ export default function ConnectionScreen() {
               {t("StopTextInput.to")}
             </ThemedText>
             <ThemedText type="defaultBold">
-              {t("SearchButton.search")}
+              {toStop ? toStop.name : t("StopTextInput.selectStop")}
             </ThemedText>
           </Pressable>
         </ThemedView>
@@ -63,7 +66,7 @@ export default function ConnectionScreen() {
           onPress={() =>
             router.push({
               pathname: "/results",
-              params: { from: "", to: "" },
+              params: { from: fromStop?.id.toString() ?? "", to: toStop?.id.toString() ?? "" },
             })
           }
         >

@@ -5,24 +5,21 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
 
-const MOCK_STOPS = [
-  "Hlavní nádraží",
-  "Náměstí Republiky",
-  "Florenc",
-  "Anděl",
-  "Smíchovské nádraží",
-  "Dejvická",
-  "Hradčanská",
-  "Malostranská",
-  "Staroměstská",
-  "Muzeum",
-];
+import { useRootStore } from "@/stores/rootStore";
+import { StopDto } from "@/types/stopDto";
 
 export default function StopPickerScreen() {
   const { field } = useLocalSearchParams<{ field: "from" | "to" }>();
+  const stops = useRootStore((state) => state.stops);
+  const setFromStop = useRootStore((state) => state.setFromStop);
+  const setToStop = useRootStore((state) => state.setToStop);
 
-  function handleSelect(stop: string) {
-    // TODO: uložit vybranou zastávku do store / query param
+  function handleSelect(stop: StopDto) {
+    if (field === "from") {
+      setFromStop(stop);
+    } else {
+      setToStop(stop);
+    }
     router.back();
   }
 
@@ -33,9 +30,9 @@ export default function StopPickerScreen() {
       </ThemedText>
 
       <ScrollView contentContainerStyle={styles.list}>
-        {MOCK_STOPS.map((stop) => (
+        {stops.map((stop) => (
           <Pressable
-            key={stop}
+            key={stop.id}
             style={({ pressed }) => [
               styles.stopItem,
               pressed && styles.pressed,
@@ -43,7 +40,7 @@ export default function StopPickerScreen() {
             onPress={() => handleSelect(stop)}
           >
             <ThemedView type="backgroundElement" style={styles.stopCard}>
-              <ThemedText type="defaultBold">{stop}</ThemedText>
+              <ThemedText type="defaultBold">{stop.name}</ThemedText>
             </ThemedView>
           </Pressable>
         ))}
