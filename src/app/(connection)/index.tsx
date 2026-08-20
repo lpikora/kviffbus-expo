@@ -39,7 +39,7 @@ export default function ConnectionScreen() {
                   styles.stopRow,
                   pressed && styles.pressed,
                 ]}
-                onPress={() => router.push("/stop-picker?field=from")}
+                onPress={() => router.navigate("/stop-picker?field=from")}
               >
                 <ThemedText themeColor="textSecondary" type="small">
                   {t("StopTextInput.from")}
@@ -56,7 +56,7 @@ export default function ConnectionScreen() {
                   styles.stopRow,
                   pressed && styles.pressed,
                 ]}
-                onPress={() => router.push("/stop-picker?field=to")}
+                onPress={() => router.navigate("/stop-picker?field=to")}
               >
                 <ThemedText themeColor="textSecondary" type="small">
                   {t("StopTextInput.to")}
@@ -102,7 +102,7 @@ export default function ConnectionScreen() {
             pressed && styles.pressed,
           ]}
           onPress={() => {
-            router.push({
+            router.navigate({
               pathname: "/results",
               params: {
                 from: fromStop?.id.toString() ?? "",

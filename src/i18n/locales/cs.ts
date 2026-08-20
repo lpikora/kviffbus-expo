@@ -11,6 +11,7 @@ export default {
       line2:
         "Neoficiální aplikace pro snadné vyhledávání spojení mezi zastávkami v rámci festivalové autobusové dopravy v Karlových Varech.",
     },
+    about: "O aplikaci",
   },
   StopTextInput: {
     from: "Odkud",

@@ -6612,9 +6612,7 @@
         "timeArrival": "8:20"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 501
     },
@@ -6627,9 +6625,7 @@
         "timeArrival": "8:50"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 502
     },
@@ -6642,9 +6638,7 @@
         "timeArrival": "9:20"
       },
       "busNumber": "9",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 503
     },
@@ -6657,9 +6651,7 @@
         "timeArrival": "8:23"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 504
     },
@@ -6672,9 +6664,7 @@
         "timeArrival": "8:53"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 505
     },
@@ -6687,9 +6677,7 @@
         "timeArrival": "8:27"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 506
     },
@@ -6702,9 +6690,7 @@
         "timeArrival": "8:57"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 507
     },
@@ -6717,9 +6703,7 @@
         "timeArrival": "8:34"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 508
     },
@@ -6732,9 +6716,7 @@
         "timeArrival": "9:04"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 509
     },
@@ -6747,9 +6729,7 @@
         "timeArrival": "8:23"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 510
     },
@@ -6762,9 +6742,7 @@
         "timeArrival": "8:53"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 511
     },
@@ -6777,9 +6755,7 @@
         "timeArrival": "8:27"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 512
     },
@@ -6792,9 +6768,7 @@
         "timeArrival": "8:57"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 513
     },
@@ -6807,9 +6781,7 @@
         "timeArrival": "8:34"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 514
     },
@@ -6822,9 +6794,7 @@
         "timeArrival": "9:04"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 515
     },
@@ -6837,9 +6807,7 @@
         "timeArrival": "8:27"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 516
     },
@@ -6852,9 +6820,7 @@
         "timeArrival": "8:57"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 517
     },
@@ -6867,9 +6833,7 @@
         "timeArrival": "8:34"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 518
     },
@@ -6882,9 +6846,7 @@
         "timeArrival": "9:04"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 519
     },
@@ -6897,9 +6859,7 @@
         "timeArrival": "8:34"
       },
       "busNumber": "5",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 520
     },
@@ -6912,9 +6872,7 @@
         "timeArrival": "9:04"
       },
       "busNumber": "7",
-      "goesOnlyOn": [
-        "2026-07-12"
-      ],
+      "goesOnlyOn": ["2026-07-12"],
       "notGoesOn": [],
       "id": 521
     },
@@ -20394,13 +20352,11 @@
     "officialKViffWebTransportUrl": "https://www.kviff.com/cs/pruvodce-festivalem/doprava",
     "appWebUrl": "https://kviffbus.cz",
     "dataUrl": "https://kviffbus.cz/data/data.json",
-    "forceUpdatePackageIds": [
-      "1.0"
-    ],
+    "forceUpdatePackageIds": ["1.0"],
     "timetablesValidTillDate": "2027-10-20",
     "operationsStartDate": "2026-07-03 07:00:00",
     "operationsEndDate": "2026-10-12 03:00:00",
-    "importVersion": "2026.1",
+    "importVersion": "2026.2",
     "festivalEditionNumber": "60",
     "festivalYear": "2026",
     "contactEmail": "info@kviffbus.cz"

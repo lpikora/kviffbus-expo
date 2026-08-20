@@ -25,10 +25,6 @@ export default function StopPickerScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="subtitle" style={styles.heading}>
-        {field === "from" ? "Odkud" : "Kam"}
-      </ThemedText>
-
       <ScrollView contentContainerStyle={styles.list}>
         {stops.map((stop) => (
           <Pressable

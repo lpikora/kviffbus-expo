@@ -10,6 +10,7 @@ export default {
       line2:
         "Unofficial app for easy route search within the Karlovy Vary festival bus service.",
     },
+    about: "About App",
   },
   StopTextInput: {
     from: "From",

@@ -302,7 +302,7 @@ export class ConnectionService {
     return time.split(":").map((x) => +x);
   }
 
-  private static getDateTimeStringFromNowToDate(date: Date) {
+  public static getDateTimeStringFromNowToDate(date: Date) {
     const nowDate = new Date();
     const seconds = (date.getTime() - nowDate.getTime()) / 1000;
     const todayDateString =
@@ -334,7 +334,7 @@ export class ConnectionService {
     return i18n.t("time.in") + " " + (h && h + " h " + m + " min");
   }
 
-  private static getDurationBetweenTwoTimes(
+  public static getDurationBetweenTwoTimes(
     departureTime: string,
     arrivalTime: string,
   ) {

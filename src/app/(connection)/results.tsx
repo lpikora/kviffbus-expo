@@ -1,47 +1,71 @@
-import { useLocalSearchParams } from "expo-router";
-import { ScrollView, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, View } from "react-native";
 
+import { ResultsListItem } from "@/components/results-item";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { useRootStore } from "@/stores/rootStore";
+import { ConnectionDto } from "@/types/connectionDto";
+import { t } from "i18next";
 
 export default function ResultsScreen() {
-  const { from, to } = useLocalSearchParams<{ from: string; to: string }>();
-  const insets = useSafeAreaInsets();
+  const results = useRootStore((state) => state.results);
+  const fromStop = useRootStore((state) => state.fromStop);
+  const toStop = useRootStore((state) => state.toStop);
 
-  return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.contentContainer,
-        {
-          paddingBottom: insets.bottom + BottomTabInset + Spacing.three,
-        },
-      ]}
-    >
-      <ThemedView style={styles.inner}>
-        <ThemedText type="subtitle">
-          {from || "?"} → {to || "?"}
-        </ThemedText>
+  const keyExtractor = (item: ConnectionDto) =>
+    item.id.toString() + item.departureDate?.toDateString();
 
-        {/* TODO: seznam spojení */}
-        <ThemedText themeColor="textSecondary">
-          Zde se zobrazí výsledky vyhledávání.
+  const renderItem = (item: ConnectionDto) => {
+    return (
+      <View style={styles.container}>
+        <ResultsListItem
+          lineId={item.lineId}
+          timeDeparture={item.departureArrivalTimes.timeDeparture}
+          timeArrival={item.departureArrivalTimes.timeArrival}
+          fromName={fromStop?.name || ""}
+          toName={toStop?.name || ""}
+          departureDate={item.departureDate ?? new Date()}
+        />
+      </View>
+    );
+  };
+
+  if (results && results.length > 0) {
+    return (
+      <ThemedView style={styles.container}>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          keyExtractor={keyExtractor}
+          data={results}
+          renderItem={({ item }) => renderItem(item)}
+          extraData={[fromStop, toStop]}
+        />
+      </ThemedView>
+    );
+  } else {
+    return (
+      <ThemedView style={styles.noConnectionsContainer}>
+        <ThemedText style={styles.noConnectionsText}>
+          {t("results.noResults")}
         </ThemedText>
       </ThemedView>
-    </ScrollView>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    padding: Spacing.four,
-  },
-  inner: {
+  container: {
     flex: 1,
-    maxWidth: MaxContentWidth,
-    gap: Spacing.three,
+  },
+  noConnectionsContainer: {
+    flex: 1,
+    paddingTop: 30,
+    alignItems: "center",
+  },
+  bannerContainer: {
+    paddingVertical: 20,
+  },
+  noConnectionsText: {
+    fontSize: 15,
   },
 });

@@ -20,17 +20,17 @@ export default function AppTabs() {
           {t("HomeScreen.connections")}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/home.png")}
+          src={require("@/assets/images/tabIcons/connection.png")}
           renderingMode="template"
         />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="(about)">
         <NativeTabs.Trigger.Label>
-          {t("AboutApp.title")}
+          {t("HomeScreen.about")}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/explore.png")}
+          src={require("@/assets/images/tabIcons/about.png")}
           renderingMode="template"
         />
       </NativeTabs.Trigger>

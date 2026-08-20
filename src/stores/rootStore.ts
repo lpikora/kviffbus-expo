@@ -1,6 +1,7 @@
 import { ConnectionService } from "@/services/connectionService";
 import { DataService } from "@/services/dataService";
 import { clientStorage } from "@/services/storage";
+import { AppConfigDto } from "@/types/appConfigDto";
 import { ConnectionDto } from "@/types/connectionDto";
 import {
   DepartureDateTimeType,
@@ -19,8 +20,8 @@ export interface StopsStoreState {
   connections: ConnectionDto[];
   stopExceptions: StopExceptionDto[];
   departureDateTime: DepartureDateTimeType;
-  results: any[];
-  appConfig: any | null;
+  results: ConnectionDto[];
+  appConfig: AppConfigDto;
   searchCount: number;
 }
 
@@ -82,29 +83,26 @@ export const useRootStore = create<StopsStore>()(
           toStop: state.fromStop,
         })),
       syncWithApi: async () => {
+        if (__DEV__) {
+          console.log("Sync with API skipped because __DEV__ is true");
+          return;
+        }
         try {
           const remoteData = await DataService.fetchLatestData();
-          const current = get();
+          const { appConfig: currentAppConfig } = get();
 
-          // TODO check only version
-          const stopsChanged =
-            JSON.stringify(current.stops) !== JSON.stringify(remoteData.stops);
-          const configChanged =
-            JSON.stringify(current.appConfig) !==
-            JSON.stringify(remoteData.appConfig);
-          const connectionsChanged =
-            JSON.stringify(current.connections) !==
-            JSON.stringify(remoteData.connections);
-
-          if (stopsChanged || configChanged || connectionsChanged) {
-            set({
-              ...(stopsChanged && { stops: remoteData.stops }),
-              ...(configChanged && { appConfig: remoteData.appConfig }),
-              ...(connectionsChanged && {
-                connections: remoteData.connections,
-              }),
-            });
+          if (
+            remoteData.appConfig.importVersion <= currentAppConfig.importVersion
+          ) {
+            return;
           }
+
+          set({
+            stops: remoteData.stops,
+            connections: remoteData.connections,
+            stopExceptions: remoteData.stopExceptions,
+            appConfig: remoteData.appConfig,
+          });
         } catch (error) {
           console.warn(
             "API offline / chyba. Ponechána data z data.json",
@@ -122,6 +120,7 @@ export const useRootStore = create<StopsStore>()(
           stopExceptions,
           appConfig,
         } = get();
+
         const results = ConnectionService.searchConnections(
           connections,
           stops,
@@ -133,6 +132,7 @@ export const useRootStore = create<StopsStore>()(
             departureDateTime,
           },
         );
+
         set({ results });
       },
       reset: () => set(stopsStoreDefaultValues),
@@ -140,16 +140,25 @@ export const useRootStore = create<StopsStore>()(
     {
       name: "kviffbus-store",
       storage: createJSONStorage(() => clientStorage),
-      partialize: (state) => ({
-        stops: state.stops,
-        connections: state.connections,
-        stopExceptions: state.stopExceptions,
-        appConfig: state.appConfig,
-        fromStop: state.fromStop,
-        toStop: state.toStop,
-        // departureDateTime NENÍ -> při startu aplikace bude vždy defaultní
-        // results i searchCount NENÍ -> po restartu začnou znova
-      }),
+      partialize: (state) => {
+        if (__DEV__) {
+          // In DEV mode: Only persist user-selected values (excluding heavy/static dataset keys)
+          return {
+            fromStop: state.fromStop,
+            toStop: state.toStop,
+          };
+        }
+
+        // In PRODUCTION: Persist everything including dataset keys
+        return {
+          stops: state.stops,
+          connections: state.connections,
+          stopExceptions: state.stopExceptions,
+          appConfig: state.appConfig,
+          fromStop: state.fromStop,
+          toStop: state.toStop,
+        };
+      },
     },
   ),
 );
