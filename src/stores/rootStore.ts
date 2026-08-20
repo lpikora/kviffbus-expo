@@ -1,3 +1,4 @@
+import { ConnectionService } from "@/services/connectionService";
 import { DataService } from "@/services/dataService";
 import { clientStorage } from "@/services/storage";
 import { ConnectionDto } from "@/types/connectionDto";
@@ -6,6 +7,7 @@ import {
   TypeOfDepartureDateTimeType,
 } from "@/types/departureDateTimeType";
 import { StopDto } from "@/types/stopDto";
+import { StopExceptionDto } from "@/types/stopExceptionDto";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -15,6 +17,7 @@ export interface StopsStoreState {
   toStop: StopDto | null;
   stops: StopDto[];
   connections: ConnectionDto[];
+  stopExceptions: StopExceptionDto[];
   departureDateTime: DepartureDateTimeType;
   results: any[];
   appConfig: any | null;
@@ -26,6 +29,7 @@ export interface StopsStoreActions {
   setToStop: (stop: StopDto | null) => void;
   setStops: (stops: StopDto[]) => void;
   setConnections: (connections: ConnectionDto[]) => void;
+  setStopExceptions: (stopExceptions: StopExceptionDto[]) => void;
   setDepartureDateTime: (
     departureDateTime: Partial<DepartureDateTimeType>,
   ) => void;
@@ -34,6 +38,7 @@ export interface StopsStoreActions {
   incrementSearchCount: () => void;
   swapStops: () => void;
   syncWithApi: () => Promise<void>;
+  searchConnections: () => void;
   reset: () => void;
 }
 export type StopsStore = StopsStoreState & StopsStoreActions;
@@ -42,6 +47,7 @@ export const stopsStoreDefaultValues: StopsStoreState = {
   toStop: null,
   stops: DataService.getLocalData().stops,
   connections: DataService.getLocalData().connections,
+  stopExceptions: DataService.getLocalData().stopExceptions,
   departureDateTime: {
     type: TypeOfDepartureDateTimeType.now,
     date: null,
@@ -58,6 +64,7 @@ export const useRootStore = create<StopsStore>()(
       setToStop: (toStop) => set({ toStop }),
       setStops: (stops) => set({ stops }),
       setConnections: (connections) => set({ connections }),
+      setStopExceptions: (stopExceptions) => set({ stopExceptions }),
       setDepartureDateTime: (departureDateTime) =>
         set((state) => ({
           departureDateTime: {
@@ -105,6 +112,29 @@ export const useRootStore = create<StopsStore>()(
           );
         }
       },
+      searchConnections: () => {
+        const {
+          fromStop,
+          toStop,
+          departureDateTime,
+          connections,
+          stops,
+          stopExceptions,
+          appConfig,
+        } = get();
+        const results = ConnectionService.searchConnections(
+          connections,
+          stops,
+          stopExceptions,
+          appConfig,
+          {
+            fromStop,
+            toStop,
+            departureDateTime,
+          },
+        );
+        set({ results });
+      },
       reset: () => set(stopsStoreDefaultValues),
     }),
     {
@@ -113,6 +143,7 @@ export const useRootStore = create<StopsStore>()(
       partialize: (state) => ({
         stops: state.stops,
         connections: state.connections,
+        stopExceptions: state.stopExceptions,
         appConfig: state.appConfig,
         fromStop: state.fromStop,
         toStop: state.toStop,

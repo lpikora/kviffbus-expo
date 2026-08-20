@@ -17,7 +17,10 @@ export default function ConnectionScreen() {
   const fromStop = useRootStore((state) => state.fromStop);
   const toStop = useRootStore((state) => state.toStop);
   const departureDateTime = useRootStore((state) => state.departureDateTime);
-  const setDepartureDateTime = useRootStore((state) => state.setDepartureDateTime);
+  const setDepartureDateTime = useRootStore(
+    (state) => state.setDepartureDateTime,
+  );
+  const searchConnections = useRootStore((state) => state.searchConnections);
   const swapStops = useRootStore((state) => state.swapStops);
 
   return (
@@ -32,7 +35,10 @@ export default function ConnectionScreen() {
           <ThemedView style={styles.cardContent}>
             <ThemedView style={styles.inputsColumn}>
               <Pressable
-                style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
+                style={({ pressed }) => [
+                  styles.stopRow,
+                  pressed && styles.pressed,
+                ]}
                 onPress={() => router.push("/stop-picker?field=from")}
               >
                 <ThemedText themeColor="textSecondary" type="small">
@@ -46,7 +52,10 @@ export default function ConnectionScreen() {
               <ThemedView style={styles.divider} />
 
               <Pressable
-                style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
+                style={({ pressed }) => [
+                  styles.stopRow,
+                  pressed && styles.pressed,
+                ]}
                 onPress={() => router.push("/stop-picker?field=to")}
               >
                 <ThemedText themeColor="textSecondary" type="small">
@@ -59,7 +68,10 @@ export default function ConnectionScreen() {
             </ThemedView>
 
             <Pressable
-              style={({ pressed }) => [styles.swapButton, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.swapButton,
+                pressed && styles.pressed,
+              ]}
               onPress={swapStops}
             >
               <SymbolView
@@ -83,26 +95,22 @@ export default function ConnectionScreen() {
           />
         </ThemedView>
 
-        {/* Map shortcut */}
-        <Pressable
-          style={({ pressed }) => [styles.mapButton, pressed && styles.pressed]}
-          onPress={() => router.push("/map")}
-        >
-          <ThemedText type="link">{t("HomeScreen.mapButton")}</ThemedText>
-        </Pressable>
-
         {/* Search button */}
         <Pressable
           style={({ pressed }) => [
             styles.searchButton,
             pressed && styles.pressed,
           ]}
-          onPress={() =>
+          onPress={() => {
             router.push({
               pathname: "/results",
-              params: { from: fromStop?.id.toString() ?? "", to: toStop?.id.toString() ?? "" },
-            })
-          }
+              params: {
+                from: fromStop?.id.toString() ?? "",
+                to: toStop?.id.toString() ?? "",
+              },
+            });
+            searchConnections();
+          }}
         >
           <ThemedText
             style={styles.searchButtonText}

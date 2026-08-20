@@ -20397,9 +20397,9 @@
     "forceUpdatePackageIds": [
       "1.0"
     ],
-    "timetablesValidTillDate": "2027-06-20",
+    "timetablesValidTillDate": "2027-10-20",
     "operationsStartDate": "2026-07-03 07:00:00",
-    "operationsEndDate": "2026-07-12 03:00:00",
+    "operationsEndDate": "2026-10-12 03:00:00",
     "importVersion": "2026.1",
     "festivalEditionNumber": "60",
     "festivalYear": "2026",
