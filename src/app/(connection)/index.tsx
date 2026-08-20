@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Platform, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { DateTimePicker } from "@/components/date-time-picker";
+import { DateTimePicker } from "@/components/date-time-picker/index";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
