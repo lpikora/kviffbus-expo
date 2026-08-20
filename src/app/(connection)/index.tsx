@@ -5,13 +5,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { SymbolView } from "expo-symbols";
 import { useRootStore } from "@/stores/rootStore";
+import { useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "react-i18next";
 
 export default function ConnectionScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const fromStop = useRootStore((state) => state.fromStop);
   const toStop = useRootStore((state) => state.toStop);
+  const swapStops = useRootStore((state) => state.swapStops);
 
   return (
     <ThemedView style={styles.container}>
@@ -22,31 +26,50 @@ export default function ConnectionScreen() {
 
         {/* Stop selectors */}
         <ThemedView type="backgroundElement" style={styles.card}>
-          <Pressable
-            style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
-            onPress={() => router.push("/stop-picker?field=from")}
-          >
-            <ThemedText themeColor="textSecondary" type="small">
-              {t("StopTextInput.from")}
-            </ThemedText>
-            <ThemedText type="defaultBold">
-              {fromStop ? fromStop.name : t("StopTextInput.selectStop")}
-            </ThemedText>
-          </Pressable>
+          <ThemedView style={styles.cardContent}>
+            <ThemedView style={styles.inputsColumn}>
+              <Pressable
+                style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
+                onPress={() => router.push("/stop-picker?field=from")}
+              >
+                <ThemedText themeColor="textSecondary" type="small">
+                  {t("StopTextInput.from")}
+                </ThemedText>
+                <ThemedText type="defaultBold">
+                  {fromStop ? fromStop.name : t("StopTextInput.selectStop")}
+                </ThemedText>
+              </Pressable>
 
-          <ThemedView style={styles.divider} />
+              <ThemedView style={styles.divider} />
 
-          <Pressable
-            style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
-            onPress={() => router.push("/stop-picker?field=to")}
-          >
-            <ThemedText themeColor="textSecondary" type="small">
-              {t("StopTextInput.to")}
-            </ThemedText>
-            <ThemedText type="defaultBold">
-              {toStop ? toStop.name : t("StopTextInput.selectStop")}
-            </ThemedText>
-          </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
+                onPress={() => router.push("/stop-picker?field=to")}
+              >
+                <ThemedText themeColor="textSecondary" type="small">
+                  {t("StopTextInput.to")}
+                </ThemedText>
+                <ThemedText type="defaultBold">
+                  {toStop ? toStop.name : t("StopTextInput.selectStop")}
+                </ThemedText>
+              </Pressable>
+            </ThemedView>
+
+            <Pressable
+              style={({ pressed }) => [styles.swapButton, pressed && styles.pressed]}
+              onPress={swapStops}
+            >
+              <SymbolView
+                tintColor={theme.text}
+                name={{
+                  ios: "arrow.up.arrow.down",
+                  android: "swap_vert",
+                  web: "swap_vert",
+                }}
+                size={24}
+              />
+            </Pressable>
+          </ThemedView>
         </ThemedView>
 
         {/* Map shortcut */}
@@ -103,6 +126,13 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.four,
     overflow: "hidden",
   },
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  inputsColumn: {
+    flex: 1,
+  },
   stopRow: {
     paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.three,
@@ -112,6 +142,11 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     marginHorizontal: Spacing.four,
     backgroundColor: "rgba(128,128,128,0.2)",
+  },
+  swapButton: {
+    padding: Spacing.four,
+    justifyContent: "center",
+    alignItems: "center",
   },
   pressed: {
     opacity: 0.6,
