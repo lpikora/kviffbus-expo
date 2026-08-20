@@ -2,12 +2,13 @@ import { router } from "expo-router";
 import { Platform, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { DateTimePicker } from "@/components/date-time-picker";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
-import { SymbolView } from "expo-symbols";
-import { useRootStore } from "@/stores/rootStore";
 import { useTheme } from "@/hooks/use-theme";
+import { useRootStore } from "@/stores/rootStore";
+import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
 
 export default function ConnectionScreen() {
@@ -15,6 +16,8 @@ export default function ConnectionScreen() {
   const theme = useTheme();
   const fromStop = useRootStore((state) => state.fromStop);
   const toStop = useRootStore((state) => state.toStop);
+  const departureDateTime = useRootStore((state) => state.departureDateTime);
+  const setDepartureDateTime = useRootStore((state) => state.setDepartureDateTime);
   const swapStops = useRootStore((state) => state.swapStops);
 
   return (
@@ -70,6 +73,14 @@ export default function ConnectionScreen() {
               />
             </Pressable>
           </ThemedView>
+        </ThemedView>
+
+        <ThemedView type="backgroundElement" style={styles.card}>
+          <DateTimePicker
+            value={departureDateTime}
+            onChange={setDepartureDateTime}
+            minimumDate={new Date()}
+          />
         </ThemedView>
 
         {/* Map shortcut */}
