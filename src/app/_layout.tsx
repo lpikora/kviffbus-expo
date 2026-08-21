@@ -1,8 +1,6 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { DarkTheme, DefaultTheme, SplashScreen, ThemeProvider } from "expo-router";
 import { useColorScheme } from "react-native";
 
-import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import AppTabs from "@/components/app-tabs";
 import { useInitData } from "@/hooks/use-sync-data";
 import i18n from "@/i18n";
@@ -17,7 +15,6 @@ export default function TabLayout() {
   return (
     <I18nextProvider i18n={i18n}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <AnimatedSplashOverlay />
         <AppTabs />
       </ThemeProvider>
     </I18nextProvider>
