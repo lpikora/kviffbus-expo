@@ -11,7 +11,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useRootStore } from "@/stores/rootStore";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
-
+// my comment test
 export default function ConnectionScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
