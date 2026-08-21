@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 export default function AppTabs() {
   const scheme = useColorScheme();
-  const { t } = useTranslation(); //
+  const { t } = useTranslation();
   const colors = Colors[scheme === "unspecified" ? "light" : scheme];
 
   return (

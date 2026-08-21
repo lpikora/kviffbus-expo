@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Platform, Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DateTimePicker } from "@/components/date-time-picker/index";
@@ -11,7 +11,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useRootStore } from "@/stores/rootStore";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
-// my comment test
+
 export default function ConnectionScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -115,10 +115,7 @@ export default function ConnectionScreen() {
             searchConnections();
           }}
         >
-          <ThemedText
-            style={styles.searchButtonText}
-            type={Platform.OS === "web" ? "defaultBold" : "defaultBold"}
-          >
+          <ThemedText style={styles.searchButtonText} type="defaultBold">
             {t("SearchButton.search")}
           </ThemedText>
         </Pressable>
@@ -172,10 +169,6 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.6,
-  },
-  mapButton: {
-    alignSelf: "flex-start",
-    paddingVertical: Spacing.one,
   },
   searchButton: {
     marginTop: Spacing.two,

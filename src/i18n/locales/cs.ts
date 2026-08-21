@@ -4,20 +4,16 @@ export default {
   HomeScreen: {
     title: "KVIFF Bus - Spojení",
     connections: "Spojení",
-    forceUpdateInfo:
-      "Nepodařilo se aktualizovat jízdní řády. Zkontrolujte připojení k internetu a aktualizujte aplikaci na nejnovější verzi.",
-    forceUpdateButtonTitle: "Aktualizovat aplikaci",
     info: {
       line1:
-        "Jízdní řády pro %{edition}. MFF Karlovy Vary %{year} jsou aktuální!",
-      line2:
-        "Neoficiální aplikace pro snadné vyhledávání spojení mezi zastávkami v rámci festivalové autobusové dopravy v Karlových Varech.",
+        "Jízdní řády pro {{edition}}. MFF Karlovy Vary {{year}} jsou aktuální.",
     },
     about: "O aplikaci",
   },
   StopTextInput: {
     from: "Odkud",
     to: "Kam",
+    selectStop: "Vyberte zastávku",
   },
   SearchButton: {
     search: "Hledat",
@@ -37,13 +33,15 @@ export default {
     in: "za",
   },
   selectStopFromMapScreen: {
-    buttonSelectTitle: "vybrat",
+    title: "Mapa zastávek",
+    openMap: "Zobrazit mapu zastávek",
+    comingSoon:
+      "Interaktivní mapa se připravuje. Zatím tu je oficiální plán festivalové dopravy.",
   },
   Drawer: {
-    AboutApp: "O Aplikaci",
     LinkToPdfTimetable: "Jízdní řády v PDF",
     LinkToMapImage: "Podrobná mapa zastávek",
-    RateAppInStore: "Ohodnotit aplikaci",
+    LinkToOfficialTransport: "Festivalová doprava",
   },
   momentCalendarTranslations: {
     lastDay: "[Včera v] H:mm",
@@ -53,32 +51,11 @@ export default {
     nextWeek: "dddd [v] H:mm",
     sameElse: "L",
   },
-  UpdateAlert: {
-    Title: "Máte starou verzi aplikace.",
-    Message: "Aplikaci musíte aktualzovat.",
-    UpdateButtonTitle: "Aktualizovat",
-  },
   App: {
     AppName: "KVIFF Bus",
     AppVersion: "verze",
     TimetablesVersion: "jízdní řády",
-    Back: "Zpět",
-  },
-  DonationBanner: {
-    title: "PODPOŘTE KVIFF Bus ❤️",
-    description:
-      "Používáte aplikaci pravidelně? Pomozte s jejím provozem a kupte vývojáři festivalovou dobrotu. Děkujeme!",
-    tier1: {
-      title: "Teplá oplatka",
-    },
-    tier2: {
-      title: "Pivo",
-    },
-    tier3: {
-      title: "Drink",
-    },
-    donationNote: "Příspěvek na provoz KVIFF Bus.",
-    footerText: "Všechny příspěvky jdou 100% autorovi přes Revolut. Děkuji!",
+    Contact: "Kontakt",
   },
   InfoBanner: {
     title: "O aplikaci",

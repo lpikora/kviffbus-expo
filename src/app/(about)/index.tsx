@@ -1,18 +1,26 @@
-import { Platform, ScrollView, StyleSheet } from "react-native";
+import Constants from "expo-constants";
+import { Href } from "expo-router";
+import { Linking, Platform, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
+import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { useRootStore } from "@/stores/rootStore";
 
 export default function AboutScreen() {
+  const { t } = useTranslation();
   const safeAreaInsets = useSafeAreaInsets();
   const insets = {
     ...safeAreaInsets,
     bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
   };
   const theme = useTheme();
+  const appConfig = useRootStore((state) => state.appConfig);
+  const appVersion = Constants.expoConfig?.version ?? "1.0.0";
 
   const contentPlatformStyle = Platform.select({
     android: {
@@ -34,7 +42,57 @@ export default function AboutScreen() {
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}
     >
       <ThemedView style={styles.container}>
-        <ThemedText>Hello</ThemedText>
+        <ThemedText type="subtitle">{t("App.AppName")}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {t("App.AppVersion")} {appVersion}
+          {appConfig?.importVersion
+            ? ` · ${t("App.TimetablesVersion")} ${appConfig.importVersion}`
+            : ""}
+        </ThemedText>
+
+        {appConfig?.festivalEditionNumber && appConfig.festivalYear ? (
+          <ThemedText>
+            {t("HomeScreen.info.line1", {
+              edition: appConfig.festivalEditionNumber,
+              year: appConfig.festivalYear,
+            })}
+          </ThemedText>
+        ) : null}
+
+        <ThemedText>{t("InfoBanner.description")}</ThemedText>
+
+        {appConfig ? (
+          <ThemedView style={styles.links}>
+            <ExternalLink href={appConfig.timetablesPdfUrl as Href & string}>
+              <ThemedText type="linkPrimary">
+                {t("Drawer.LinkToPdfTimetable")}
+              </ThemedText>
+            </ExternalLink>
+            <ExternalLink href={appConfig.busStopsMapImageUrl as Href & string}>
+              <ThemedText type="linkPrimary">
+                {t("Drawer.LinkToMapImage")}
+              </ThemedText>
+            </ExternalLink>
+            <ExternalLink
+              href={appConfig.officialKViffWebTransportUrl as Href & string}
+            >
+              <ThemedText type="linkPrimary">
+                {t("Drawer.LinkToOfficialTransport")}
+              </ThemedText>
+            </ExternalLink>
+            {appConfig.contactEmail ? (
+              <Pressable
+                onPress={() =>
+                  void Linking.openURL(`mailto:${appConfig.contactEmail}`)
+                }
+              >
+                <ThemedText type="linkPrimary">
+                  {t("App.Contact")}: {appConfig.contactEmail}
+                </ThemedText>
+              </Pressable>
+            ) : null}
+          </ThemedView>
+        ) : null}
       </ThemedView>
     </ScrollView>
   );
@@ -51,45 +109,11 @@ const styles = StyleSheet.create({
   container: {
     maxWidth: MaxContentWidth,
     flexGrow: 1,
-  },
-  titleContainer: {
+    paddingHorizontal: Spacing.four,
     gap: Spacing.three,
-    alignItems: "center",
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
   },
-  centerText: {
-    textAlign: "center",
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  linkButton: {
-    flexDirection: "row",
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: "center",
-    gap: Spacing.one,
-    alignItems: "center",
-  },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  collapsibleContent: {
-    alignItems: "center",
-  },
-  imageTutorial: {
-    width: "100%",
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
-    marginTop: Spacing.two,
-  },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: "center",
+  links: {
+    gap: Spacing.two,
+    paddingTop: Spacing.two,
   },
 });

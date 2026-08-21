@@ -1,9 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 import { StopPickerItem } from "@/components/stop-picker-item";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useRootStore } from "@/stores/rootStore";
@@ -24,6 +27,7 @@ export default function StopPickerScreen() {
     field?: TypeOfStopType;
   }>();
   const field = parseField(fieldParam);
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
@@ -67,6 +71,18 @@ export default function StopPickerScreen() {
         },
       ]}
     >
+      <Pressable
+        style={({ pressed }) => [styles.mapButton, pressed && styles.pressed]}
+        onPress={() => router.navigate("/map")}
+        accessibilityRole="button"
+        accessibilityLabel={t("selectStopFromMapScreen.openMap")}
+      >
+        <ThemedView type="backgroundElement" style={styles.mapButtonInner}>
+          <ThemedText type="linkPrimary">
+            {t("selectStopFromMapScreen.openMap")}
+          </ThemedText>
+        </ThemedView>
+      </Pressable>
       {stops.map((stop) => (
         <StopPickerItem
           key={stop.id}
@@ -90,5 +106,17 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: "center",
     width: "100%",
+  },
+  mapButton: {
+    width: "100%",
+    maxWidth: MaxContentWidth,
+  },
+  mapButtonInner: {
+    padding: Spacing.three,
+    borderRadius: Spacing.three,
+    alignItems: "center",
+  },
+  pressed: {
+    opacity: 0.6,
   },
 });

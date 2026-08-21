@@ -4,19 +4,15 @@ export default {
   HomeScreen: {
     title: "KVIFF Bus - Connections",
     connections: "Connections",
-    forceUpdateInfo:
-      "Timetables update failed. Please check your internet connection and update to latest version of app.",
-    forceUpdateButtonTitle: "Update application",
     info: {
-      line1: "Timetables for the %{edition} KVIFF %{year} are up to date!",
-      line2:
-        "Unofficial app for easy route search within the Karlovy Vary festival bus service.",
+      line1: "Timetables for the {{edition}} KVIFF {{year}} are up to date.",
     },
     about: "About App",
   },
   StopTextInput: {
     from: "From",
     to: "To",
+    selectStop: "Select a stop",
   },
   SearchButton: {
     search: "Search",
@@ -36,13 +32,15 @@ export default {
     in: "in",
   },
   selectStopFromMapScreen: {
-    buttonSelectTitle: "select",
+    title: "Stop map",
+    openMap: "View stop map",
+    comingSoon:
+      "The interactive map is coming soon. For now, here is the official festival transport plan.",
   },
   Drawer: {
-    AboutApp: "About App",
     LinkToPdfTimetable: "Timetable in PDF",
     LinkToMapImage: "Detailed bus stop map",
-    RateAppInStore: "Rate App in Store",
+    LinkToOfficialTransport: "Festival transport",
   },
   momentCalendarTranslations: {
     lastDay: "[Yesterday at] H:mm",
@@ -52,32 +50,11 @@ export default {
     nextWeek: "dddd [at] H:mm",
     sameElse: "L",
   },
-  UpdateAlert: {
-    Title: "Your application version is old.",
-    Message: "You need to update app.",
-    UpdateButtonTitle: "Update App",
-  },
   App: {
-    AppName: "KVIFF Bus Times",
+    AppName: "KVIFF Bus",
     AppVersion: "version",
     TimetablesVersion: "timetables",
-    Back: "Back",
-  },
-  DonationBanner: {
-    title: "Support KVIFF Bus ❤️",
-    description:
-      "Do you use the app regularly? Help support its operation and buy the developer a festival treat. Thank you!",
-    tier1: {
-      title: "Spa wafer",
-    },
-    tier2: {
-      title: "Beer",
-    },
-    tier3: {
-      title: "Cocktail",
-    },
-    donationNote: "Donation for KVIFF Bus operation.",
-    footerText: "All donations go 100% to the author via Revolut. Thank you!",
+    Contact: "Contact",
   },
   InfoBanner: {
     title: "About the App",
@@ -87,8 +64,8 @@ export default {
   errors: {
     missingStops: "Please select both a from and a to stop.",
     dataNotReady: "Timetables have not loaded yet. Please try again.",
-    dataLoadFailed: "Failed to load data.",
     searchFailed: "Failed to search for connections.",
+    dataLoadFailed: "Failed to load data.",
     unknown: "Something went wrong.",
   } satisfies Record<ErrorTranslationKey, string>,
 };

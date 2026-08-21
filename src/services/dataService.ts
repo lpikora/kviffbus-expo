@@ -14,8 +14,7 @@ export class DataService {
   }
 
   static async getRemoteData(): Promise<DataDto> {
-    // TODO
-    const response = await fetch("https://api.vasedomena.cz/config");
+    const response = await fetch("https://kviffbus.cz/data/data.json");
     if (!response.ok) {
       throw new AppError(ErrorCode.DataLoadFailed);
     }

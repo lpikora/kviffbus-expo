@@ -31,7 +31,6 @@ export interface StopsStoreState {
   departureDateTime: DepartureDateTimeType;
   results: ConnectionDto[];
   appConfig: AppConfigDto | null;
-  searchCount: number;
   isLoading: boolean;
   error: ErrorCode | null;
 }
@@ -47,7 +46,6 @@ export interface StopsStoreActions {
   ) => void;
   setResults: (results: any[]) => void;
   setAppConfig: (appConfig: any) => void;
-  incrementSearchCount: () => void;
   swapStops: () => void;
   syncWithApi: () => Promise<void>;
   initData: () => Promise<void>;
@@ -67,7 +65,6 @@ export const stopsStoreDefaultValues: StopsStoreState = {
   },
   results: [],
   appConfig: null,
-  searchCount: 0,
   isLoading: false,
   error: null,
 };
@@ -89,8 +86,6 @@ export const useRootStore = create<StopsStore>()(
         })),
       setResults: (results) => set({ results }),
       setAppConfig: (appConfig) => set({ appConfig }),
-      incrementSearchCount: () =>
-        set((state) => ({ searchCount: state.searchCount + 1 })),
       swapStops: () =>
         set((state) => ({
           fromStop: state.toStop,

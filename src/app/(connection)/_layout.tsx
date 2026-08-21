@@ -27,19 +27,12 @@ export default function ConnectionLayout() {
       />
       <Stack.Screen
         name="map"
-        options={({ route }) => {
-          const params = route.params as { field?: "from" | "to" };
-          return {
-            presentation: "modal",
-            title:
-              params?.field === "from"
-                ? t("StopTextInput.from")
-                : t("StopTextInput.to"),
-            sheetGrabberVisible: true,
-            sheetAllowedDetents: [0.25, 0.5, 1.0],
-            sheetLargestUndimmedDetentIndex: 1,
-            contentStyle: { backgroundColor: "transparent" },
-          };
+        options={{
+          presentation: "modal",
+          title: t("selectStopFromMapScreen.title"),
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [0.5, 1.0],
+          contentStyle: { backgroundColor: "transparent" },
         }}
       />
     </Stack>
