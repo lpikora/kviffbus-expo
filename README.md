@@ -22,10 +22,35 @@ npx expo start
 
 ```bash
 npm run type-check
-npm test -- --watchAll=false
+npm run test:ci
 npm run lint
 ```
 
-## Struktura
+## Architektura
 
-Routing je v `src/app` (Expo Router). Jízdní řády jsou zabalené v `assets/data/data.json`.
+Routing je v `src/app` (Expo Router). Hledání spojů žije v `ConnectionService`, UI ho jen spouští a zobrazuje výsledky.
+
+Offline-first jízdní řády:
+
+1. Bundled `assets/data/data.json` se načte po startu (a přepíše cache, když má novější `importVersion`).
+2. Zustand persistuje zastávky, spoje a config do MMKV.
+3. Na pozadí se stáhne remote JSON (`appConfig.dataUrl`), validuje se přes Zod a použije se jen při novější `importVersion`.
+
+```
+bundled data.json → MMKV persist → remote sync (importVersion)
+```
+
+## Preview build (EAS)
+
+Jednorázově (vyžaduje Expo účet):
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest init
+```
+
+Pak:
+
+```bash
+npx eas-cli@latest build --profile preview --platform android
+```

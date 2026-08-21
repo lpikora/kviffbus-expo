@@ -2,6 +2,7 @@ import { toErrorCode } from "@/errors/appError";
 import { ConnectionService } from "@/services/connectionService";
 import { DataService } from "@/services/dataService";
 import { clientStorage } from "@/services/storage";
+import { isNewerImportVersion } from "@/utils/import-version";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
 import { ConnectionDto } from "@/types/connectionDto";
@@ -44,8 +45,9 @@ export interface StopsStoreActions {
   setDepartureDateTime: (
     departureDateTime: Partial<DepartureDateTimeType>,
   ) => void;
-  setResults: (results: any[]) => void;
-  setAppConfig: (appConfig: any) => void;
+  setResults: (results: ConnectionDto[]) => void;
+  setAppConfig: (appConfig: AppConfigDto | null) => void;
+  setError: (error: ErrorCode | null) => void;
   swapStops: () => void;
   syncWithApi: () => Promise<void>;
   initData: () => Promise<void>;
@@ -86,23 +88,25 @@ export const useRootStore = create<StopsStore>()(
         })),
       setResults: (results) => set({ results }),
       setAppConfig: (appConfig) => set({ appConfig }),
+      setError: (error) => set({ error }),
       swapStops: () =>
         set((state) => ({
           fromStop: state.toStop,
           toStop: state.fromStop,
         })),
       syncWithApi: async () => {
-        if (__DEV__) {
-          console.log("Sync with API skipped because __DEV__ is true");
-          return;
-        }
         try {
-          const remoteData = await DataService.getRemoteData();
           const { appConfig: currentAppConfig } = get();
+          const remoteData = await DataService.getRemoteData(
+            currentAppConfig?.dataUrl,
+          );
 
           if (
             currentAppConfig !== null &&
-            remoteData.appConfig.importVersion <= currentAppConfig.importVersion
+            !isNewerImportVersion(
+              remoteData.appConfig.importVersion,
+              currentAppConfig.importVersion,
+            )
           ) {
             return;
           }
@@ -121,13 +125,21 @@ export const useRootStore = create<StopsStore>()(
         }
       },
       initData: async () => {
-        const { connections } = get();
-        if (connections.length > 0) {
-          return;
-        }
         set({ error: null });
         try {
           const localData = await DataService.getLocalData();
+          const { connections, appConfig } = get();
+          const persistedIsCurrent =
+            connections.length > 0 &&
+            appConfig !== null &&
+            !isNewerImportVersion(
+              localData.appConfig.importVersion,
+              appConfig.importVersion,
+            );
+
+          if (persistedIsCurrent) {
+            return;
+          }
 
           set({
             stops: localData.stops,

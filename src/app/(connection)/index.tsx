@@ -9,6 +9,7 @@ import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useRootStore } from "@/stores/rootStore";
+import { ErrorCode } from "@/types/appError";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
 
@@ -22,6 +23,7 @@ export default function ConnectionScreen() {
     (state) => state.setDepartureDateTime,
   );
   const searchConnections = useRootStore((state) => state.searchConnections);
+  const setError = useRootStore((state) => state.setError);
   const swapStops = useRootStore((state) => state.swapStops);
   const error = useRootStore((state) => state.error);
 
@@ -33,7 +35,6 @@ export default function ConnectionScreen() {
         </ThemedText>
         {error ? <ErrorMessage code={error} /> : null}
 
-        {/* Stop selectors */}
         <ThemedView type="backgroundElement" style={styles.card}>
           <ThemedView style={styles.cardContent}>
             <ThemedView style={styles.inputsColumn}>
@@ -98,21 +99,18 @@ export default function ConnectionScreen() {
           />
         </ThemedView>
 
-        {/* Search button */}
         <Pressable
           style={({ pressed }) => [
             styles.searchButton,
             pressed && styles.pressed,
           ]}
           onPress={() => {
-            router.navigate({
-              pathname: "/results",
-              params: {
-                from: fromStop?.id.toString() ?? "",
-                to: toStop?.id.toString() ?? "",
-              },
-            });
+            if (!fromStop || !toStop) {
+              setError(ErrorCode.MissingStops);
+              return;
+            }
             searchConnections();
+            router.navigate("/results");
           }}
         >
           <ThemedText style={styles.searchButtonText} type="defaultBold">

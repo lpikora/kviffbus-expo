@@ -36,9 +36,6 @@ export class ConnectionService {
     if (stops.length === 0) {
       throw new AppError(ErrorCode.DataNotReady);
     }
-    if (exceptions.length === 0) {
-      throw new AppError(ErrorCode.DataNotReady);
-    }
     if (connections.length === 0) {
       throw new AppError(ErrorCode.DataNotReady);
     }
@@ -135,7 +132,7 @@ export class ConnectionService {
     fromStop: number,
     toStop: number,
     departureDateTime: Date,
-    connections: any[],
+    connections: ConnectionDto[],
     stops: StopDto[],
     appConfig?: AppConfigDto | null,
   ) {
@@ -196,7 +193,7 @@ export class ConnectionService {
   }
 
   private static sortConnectionTimes(connections: ConnectionDto[]) {
-    return connections.sort((a: ConnectionDto, b: ConnectionDto) => {
+    return [...connections].sort((a: ConnectionDto, b: ConnectionDto) => {
       const aParts = this.getTimeNumericParts(
         a.departureArrivalTimes.timeDeparture,
       );
@@ -270,7 +267,7 @@ export class ConnectionService {
   }
 
   private static stopsArrayToObject(stops: StopDto[]) {
-    const stopsObject: any = {};
+    const stopsObject: Record<number, StopDto> = {};
     for (const stop of stops) {
       stopsObject[stop.id] = stop;
     }
@@ -279,25 +276,25 @@ export class ConnectionService {
 
   private static setStopNamesAndDepartureDateToConnections(
     connections: ConnectionDto[],
-    dasiredDepartureDate: Date,
+    desiredDepartureDate: Date,
     stops: StopDto[],
   ) {
     const stopsObject = this.stopsArrayToObject(stops);
-    const resConnections: ConnectionDto[] = JSON.parse(
-      JSON.stringify(connections),
-    );
-    resConnections.forEach((connection) => {
+    return connections.map((connection) => {
       const timeHoursMinutes = this.getTimeNumericParts(
         connection.departureArrivalTimes.timeDeparture,
       );
-      const connectionDepartureDate = new Date(dasiredDepartureDate);
+      const connectionDepartureDate = new Date(desiredDepartureDate);
       connectionDepartureDate.setHours(timeHoursMinutes[0]);
       connectionDepartureDate.setMinutes(timeHoursMinutes[1]);
-      connection.fromName = stopsObject[connection.from].name;
-      connection.toName = stopsObject[connection.to].name;
-      connection.departureDate = connectionDepartureDate;
+      return {
+        ...connection,
+        departureArrivalTimes: { ...connection.departureArrivalTimes },
+        fromName: stopsObject[connection.from].name,
+        toName: stopsObject[connection.to].name,
+        departureDate: connectionDepartureDate,
+      };
     });
-    return resConnections;
   }
 
   private static getNextDayDate(date: Date) {

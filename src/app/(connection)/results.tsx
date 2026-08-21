@@ -1,21 +1,30 @@
-import { FlatList, Platform, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  StyleSheet,
+} from "react-native";
+import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-import { useConnectionListKeyExtractor } from "@/hooks/use-connection-list-key-extractor";
-import { useConnectionListRenderItem } from "@/hooks/use-connection-list-render-item";
 import { ErrorMessage } from "@/components/error-message";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/hooks/use-theme";
+import { useConnectionListKeyExtractor } from "@/hooks/use-connection-list-key-extractor";
+import { useConnectionListRenderItem } from "@/hooks/use-connection-list-render-item";
 import { useRootStore } from "@/stores/rootStore";
-import { t } from "i18next";
 
 export default function ResultsScreen() {
-  const { results, fromStop, toStop, error } = useRootStore(
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const { results, fromStop, toStop, error, isLoading } = useRootStore(
     useShallow((state) => ({
       results: state.results,
       fromStop: state.fromStop,
       toStop: state.toStop,
       error: state.error,
+      isLoading: state.isLoading,
     })),
   );
 
@@ -24,6 +33,14 @@ export default function ResultsScreen() {
 
   const keyExtractor = useConnectionListKeyExtractor();
   const renderItem = useConnectionListRenderItem(fromName, toName);
+
+  if (isLoading) {
+    return (
+      <ThemedView style={styles.noConnectionsContainer}>
+        <ActivityIndicator color={theme.text} />
+      </ThemedView>
+    );
+  }
 
   if (error) {
     return (
