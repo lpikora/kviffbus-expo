@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { StyleSheet } from "react-native";
 
 import { Spacing } from "@/constants/theme";
@@ -15,7 +16,7 @@ interface Props {
   departureDate: Date;
 }
 
-export function ResultsListItem({
+export const ResultsListItem = memo(function ResultsListItem({
   timeDeparture,
   timeArrival,
   lineId,
@@ -68,7 +69,7 @@ export function ResultsListItem({
       </ThemedView>
     </ThemedView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
