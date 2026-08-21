@@ -4,7 +4,7 @@ Neoficiální Expo aplikace pro vyhledávání spojů festivalových autobusů (
 
 ## Požadavky
 
-- Node.js 20+
+- Node.js 24+
 - Expo CLI přes `npx`
 
 ## Spuštění
