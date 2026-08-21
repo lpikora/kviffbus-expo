@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DateTimePicker } from "@/components/date-time-picker/index";
+import { ErrorMessage } from "@/components/error-message";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
@@ -22,6 +23,7 @@ export default function ConnectionScreen() {
   );
   const searchConnections = useRootStore((state) => state.searchConnections);
   const swapStops = useRootStore((state) => state.swapStops);
+  const error = useRootStore((state) => state.error);
 
   return (
     <ThemedView style={styles.container}>
@@ -29,6 +31,7 @@ export default function ConnectionScreen() {
         <ThemedText type="title" style={styles.title}>
           {t("HomeScreen.title")}
         </ThemedText>
+        {error ? <ErrorMessage code={error} /> : null}
 
         {/* Stop selectors */}
         <ThemedView type="backgroundElement" style={styles.card}>

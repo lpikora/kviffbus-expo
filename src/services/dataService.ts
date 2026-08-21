@@ -1,3 +1,5 @@
+import { AppError } from "@/errors/appError";
+import { ErrorCode } from "@/types/appError";
 import { DataDto } from "@/types/dataDto";
 
 export class DataService {
@@ -15,7 +17,7 @@ export class DataService {
     // TODO
     const response = await fetch("https://api.vasedomena.cz/config");
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new AppError(ErrorCode.DataLoadFailed);
     }
     return await response.json();
   }

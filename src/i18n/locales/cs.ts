@@ -1,3 +1,5 @@
+import { ErrorTranslationKey } from "@/types/appError";
+
 export default {
   HomeScreen: {
     title: "KVIFF Bus - Spojení",
@@ -83,4 +85,11 @@ export default {
     description:
       "Neoficiální aplikace od fanouška festivalu pro snadné vyhledávání spojů festivalových autobusů (linek F1, F2, F3). Ušetři si čas i nohy mezi promítáními a užij si Vary naplno!",
   },
+  errors: {
+    missingStops: "Vyberte zastávku odkud i kam.",
+    dataNotReady: "Jízdní řády se ještě nenačetly. Zkuste to znovu.",
+    dataLoadFailed: "Nastala chyba při načítání dat.",
+    searchFailed: "Nastala chyba při hledání spojů.",
+    unknown: "Něco se pokazilo.",
+  } satisfies Record<ErrorTranslationKey, string>,
 };

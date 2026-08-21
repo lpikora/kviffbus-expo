@@ -21,7 +21,6 @@ export default function ConnectionLayout() {
                 ? t("StopTextInput.from")
                 : t("StopTextInput.to"),
             sheetGrabberVisible: true,
-            headerTransparent: true,
             contentStyle: { backgroundColor: "transparent" },
           };
         }}

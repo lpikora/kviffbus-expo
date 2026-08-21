@@ -1,3 +1,5 @@
+import { ErrorTranslationKey } from "@/types/appError";
+
 export default {
   HomeScreen: {
     title: "KVIFF Bus - Connections",
@@ -82,4 +84,11 @@ export default {
     description:
       "An unofficial app by a festival fan for easy connection searches on the festival bus lines (F1, F2, F3). Save your time and feet between screenings and enjoy Vary to the fullest!",
   },
+  errors: {
+    missingStops: "Please select both a from and a to stop.",
+    dataNotReady: "Timetables have not loaded yet. Please try again.",
+    dataLoadFailed: "Failed to load data.",
+    searchFailed: "Failed to search for connections.",
+    unknown: "Something went wrong.",
+  } satisfies Record<ErrorTranslationKey, string>,
 };

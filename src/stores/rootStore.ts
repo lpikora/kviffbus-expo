@@ -1,7 +1,9 @@
+import { toErrorCode } from "@/errors/appError";
 import { ConnectionService } from "@/services/connectionService";
 import { DataService } from "@/services/dataService";
 import { clientStorage } from "@/services/storage";
 import { AppConfigDto } from "@/types/appConfigDto";
+import { ErrorCode } from "@/types/appError";
 import { ConnectionDto } from "@/types/connectionDto";
 import {
   DepartureDateTimeType,
@@ -31,7 +33,7 @@ export interface StopsStoreState {
   appConfig: AppConfigDto | null;
   searchCount: number;
   isLoading: boolean;
-  error: string | null;
+  error: ErrorCode | null;
 }
 
 export interface StopsStoreActions {
@@ -139,7 +141,7 @@ export const useRootStore = create<StopsStore>()(
             appConfig: localData.appConfig,
           });
         } catch (error) {
-          set({ error: "Nastala chyba při načítání dat" });
+          set({ error: toErrorCode(error) });
           console.warn("Offline/Data load failed", error);
         }
       },
@@ -170,8 +172,7 @@ export const useRootStore = create<StopsStore>()(
 
           set({ results });
         } catch (error) {
-          // TODO localize
-          set({ error: "Nastala chyba při hledání spojů. " });
+          set({ results: [], error: toErrorCode(error) });
           console.warn("Error in searchConnections", error);
         } finally {
           set({ isLoading: false });

@@ -1,5 +1,7 @@
+import { AppError } from "@/errors/appError";
 import i18n from "@/i18n";
 import { AppConfigDto } from "@/types/appConfigDto";
+import { ErrorCode } from "@/types/appError";
 import { ConnectionDto } from "@/types/connectionDto";
 import {
   DepartureDateTimeType,
@@ -16,9 +18,6 @@ export interface SearchParams {
 }
 
 export class ConnectionService {
-  /**
-   * Vyhledá spoje na základě zadaných parametrů z datové sady
-   */
   static searchConnections(
     connections: ConnectionDto[],
     stops: StopDto[],
@@ -29,19 +28,19 @@ export class ConnectionService {
     const { fromStop, toStop, departureDateTime: depTime } = params;
 
     if (!fromStop || !toStop) {
-      throw new Error("fromStop or toStop is null");
+      throw new AppError(ErrorCode.MissingStops);
     }
     if (!appConfig) {
-      throw new Error("appConfig is null");
+      throw new AppError(ErrorCode.DataNotReady);
     }
     if (stops.length === 0) {
-      throw new Error("stops is empty");
+      throw new AppError(ErrorCode.DataNotReady);
     }
     if (exceptions.length === 0) {
-      throw new Error("exceptions is empty");
+      throw new AppError(ErrorCode.DataNotReady);
     }
     if (connections.length === 0) {
-      throw new Error("connections is empty");
+      throw new AppError(ErrorCode.DataNotReady);
     }
 
     const departureDateTime =

@@ -1,15 +1,14 @@
-import { createElement, useCallback, useState } from "react";
-import { Alert, Modal, View } from "react-native";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { useCallback, useState } from "react";
+import { Alert, Modal, useColorScheme, View } from "react-native";
 
 import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
 
 import { DateTimePickerTrigger } from "./date-time-picker-trigger";
 import { PickerModalActions } from "./picker-modal-actions";
 import { dateTimePickerStyles as styles } from "./styles";
 import type { DateTimePickerProps } from "./types";
 import { useDepartureDateTimePicker } from "./use-departure-date-time-picker";
-import { toInputValue } from "./utils";
 
 export type { DateTimePickerProps } from "./types";
 
@@ -19,6 +18,7 @@ export function DateTimePicker({
   minimumDate,
   maximumDate,
 }: DateTimePickerProps) {
+  const colorScheme = useColorScheme();
   const [showPicker, setShowPicker] = useState(false);
   const [pickerDate, setPickerDate] = useState(() => value.date ?? new Date());
 
@@ -30,13 +30,13 @@ export function DateTimePicker({
     setShowPicker(true);
   }, [value.date]);
 
-  const openPicker = () => {
+  const openPicker = useCallback(() => {
     Alert.alert(t("selectTime.pickerTitle"), undefined, [
       { text: t("selectTime.departureNow"), onPress: setDepartureNow },
       { text: t("selectTime.departureOn"), onPress: openPickerModal },
       { text: t("selectTime.cancel"), style: "cancel" },
     ]);
-  };
+  }, [t, setDepartureNow, openPickerModal]);
 
   const confirmPicker = () => {
     setDepartureDateTime(pickerDate);
@@ -54,26 +54,15 @@ export function DateTimePicker({
       <Modal transparent animationType="slide" visible={showPicker}>
         <View style={styles.modalOverlay}>
           <ThemedView type="backgroundElement" style={styles.modalContent}>
-            {createElement("input", {
-              type: "datetime-local",
-              value: toInputValue(pickerDate),
-              min: minimumDate ? toInputValue(minimumDate) : undefined,
-              max: maximumDate ? toInputValue(maximumDate) : undefined,
-              onChange: (event: Event & { target: HTMLInputElement }) => {
-                const nextDate = new Date(event.target.value);
-
-                if (!Number.isNaN(nextDate.getTime())) {
-                  setPickerDate(nextDate);
-                }
-              },
-              style: {
-                width: "100%",
-                fontSize: 16,
-                padding: Spacing.three,
-                border: "none",
-                background: "transparent",
-              },
-            })}
+            <RNDateTimePicker
+              value={pickerDate}
+              mode="datetime"
+              display="spinner"
+              minimumDate={minimumDate}
+              maximumDate={maximumDate}
+              themeVariant={colorScheme === "dark" ? "dark" : "light"}
+              onValueChange={(_event, date) => setPickerDate(date)}
+            />
             <PickerModalActions
               cancelLabel={t("selectTime.cancel")}
               confirmLabel={t("selectTime.ok")}

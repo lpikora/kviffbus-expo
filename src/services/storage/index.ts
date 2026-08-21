@@ -1,7 +1,9 @@
 import { AppStorage } from "@/types/appStorage";
 import { createMMKV } from "react-native-mmkv";
 
-const storage = createMMKV({ id: "kviff-bus-storage" });
+const STORAGE_ID = "kviff-bus-storage";
+
+const storage = createMMKV({ id: STORAGE_ID });
 
 export const clientStorage: AppStorage = {
   getItem: (name: string) => storage.getString(name) ?? null,

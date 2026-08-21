@@ -3,17 +3,19 @@ import { useShallow } from "zustand/react/shallow";
 
 import { useConnectionListKeyExtractor } from "@/hooks/use-connection-list-key-extractor";
 import { useConnectionListRenderItem } from "@/hooks/use-connection-list-render-item";
+import { ErrorMessage } from "@/components/error-message";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useRootStore } from "@/stores/rootStore";
 import { t } from "i18next";
 
 export default function ResultsScreen() {
-  const { results, fromStop, toStop } = useRootStore(
+  const { results, fromStop, toStop, error } = useRootStore(
     useShallow((state) => ({
       results: state.results,
       fromStop: state.fromStop,
       toStop: state.toStop,
+      error: state.error,
     })),
   );
 
@@ -22,6 +24,14 @@ export default function ResultsScreen() {
 
   const keyExtractor = useConnectionListKeyExtractor();
   const renderItem = useConnectionListRenderItem(fromName, toName);
+
+  if (error) {
+    return (
+      <ThemedView style={styles.noConnectionsContainer}>
+        <ErrorMessage code={error} />
+      </ThemedView>
+    );
+  }
 
   if (results && results.length > 0) {
     return (
