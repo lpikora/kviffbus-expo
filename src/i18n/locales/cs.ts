@@ -18,6 +18,9 @@ export default {
   SearchButton: {
     search: "Hledat",
   },
+  a11y: {
+    swapStops: "Prohodit zastávky odkud a kam",
+  },
   selectTime: {
     pickerTitle: "Datum a čas odjezdu",
     ok: "OK",

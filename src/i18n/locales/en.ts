@@ -17,6 +17,9 @@ export default {
   SearchButton: {
     search: "Search",
   },
+  a11y: {
+    swapStops: "Swap from and to stops",
+  },
   selectTime: {
     pickerTitle: "Departure Time",
     ok: "OK",

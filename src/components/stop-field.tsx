@@ -13,14 +13,19 @@ interface Props {
 
 export function StopField({ field, stopName }: Props) {
   const { t } = useTranslation();
+  const fieldLabel =
+    field === "from" ? t("StopTextInput.from") : t("StopTextInput.to");
+  const valueLabel = stopName ?? t("StopTextInput.selectStop");
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${fieldLabel}, ${valueLabel}`}
       style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
       onPress={() => router.navigate(`/stop-picker?field=${field}`)}
     >
       <AppText variant="caption" tone="muted">
-        {field === "from" ? t("StopTextInput.from") : t("StopTextInput.to")}
+        {fieldLabel}
       </AppText>
       <AppText variant="bodyBold">
         {stopName ?? t("StopTextInput.selectStop")}

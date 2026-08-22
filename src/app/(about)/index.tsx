@@ -75,6 +75,8 @@ export default function AboutScreen() {
             </ExternalLink>
             {appConfig.contactEmail ? (
               <Pressable
+                accessibilityRole="link"
+                accessibilityLabel={`${t("App.Contact")}: ${appConfig.contactEmail}`}
                 onPress={() =>
                   void Linking.openURL(`mailto:${appConfig.contactEmail}`)
                 }

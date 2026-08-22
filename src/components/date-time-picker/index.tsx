@@ -48,7 +48,12 @@ export function DateTimePicker({
     <>
       <DateTimePickerTrigger value={displayText} onPress={openPicker} />
 
-      <Modal transparent animationType="slide" visible={showPicker}>
+      <Modal
+        transparent
+        animationType="slide"
+        visible={showPicker}
+        accessibilityViewIsModal
+      >
         <View style={styles.modalOverlay}>
           <View
             style={[

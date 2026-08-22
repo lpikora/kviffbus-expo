@@ -22,6 +22,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
       <ErrorMessage code={ErrorCode.Unknown} />
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={t("ErrorBoundary.retry")}
         onPress={() => {
           void retry();
         }}

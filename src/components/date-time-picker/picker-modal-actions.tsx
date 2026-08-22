@@ -20,12 +20,16 @@ export function PickerModalActions({
   return (
     <View style={styles.modalButtons}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={cancelLabel}
         style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
         onPress={onCancel}
       >
         <AppText>{cancelLabel}</AppText>
       </Pressable>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={confirmLabel}
         style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
         onPress={onConfirm}
       >

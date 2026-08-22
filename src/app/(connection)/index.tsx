@@ -50,6 +50,8 @@ export default function ConnectionScreen() {
         </View>
 
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("SearchButton.search")}
           style={({ pressed }) => [
             styles.searchButton,
             { backgroundColor: theme.colors.accent },

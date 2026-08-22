@@ -13,6 +13,7 @@ export function ExternalLink({ href, ...rest }: Props) {
   return (
     <Link
       target="_blank"
+      accessibilityRole="link"
       {...rest}
       href={href}
       onPress={async (event) => {

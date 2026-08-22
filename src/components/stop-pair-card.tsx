@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { ArrowUpDownIcon } from "@/components/icons/arrow-up-down-icon";
@@ -7,6 +8,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useSearchStore } from "@/stores/search-store";
 
 export function StopPairCard() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const fromStop = useSearchStore((state) => state.fromStop);
   const toStop = useSearchStore((state) => state.toStop);
@@ -24,6 +26,8 @@ export function StopPairCard() {
         </View>
 
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("a11y.swapStops")}
           style={({ pressed }) => [styles.swapButton, pressed && styles.pressed]}
           onPress={swapStops}
         >
