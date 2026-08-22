@@ -1,6 +1,6 @@
-import { SymbolView } from "expo-symbols";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { ArrowUpDownIcon } from "@/components/icons/arrow-up-down-icon";
 import { StopField } from "@/components/stop-field";
 import { radius, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -27,14 +27,7 @@ export function StopPairCard() {
           style={({ pressed }) => [styles.swapButton, pressed && styles.pressed]}
           onPress={swapStops}
         >
-          <SymbolView
-            tintColor={theme.colors.fg}
-            name={{
-              ios: "arrow.up.arrow.down",
-              android: "swap_vert",
-            }}
-            size={24}
-          />
+          <ArrowUpDownIcon />
         </Pressable>
       </View>
     </View>
