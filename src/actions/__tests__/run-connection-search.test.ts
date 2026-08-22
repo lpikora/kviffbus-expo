@@ -7,6 +7,7 @@ import {
 } from "@/services/__tests__/fixtures";
 import { searchConnections } from "@/services/connection-service";
 import { ErrorCode } from "@/types/appError";
+import { TypeOfDepartureDateTimeType } from "@/types/departureDateTimeType";
 import { connectionKey } from "@/utils/connection-key";
 
 jest.mock("@/services/storage", () => {
@@ -63,10 +64,32 @@ describe("runConnectionSearch", () => {
     expect(state.resultsQuery).toEqual({
       fromStopId: thermalStop.id,
       toStopId: puppStop.id,
+      departureType: state.departureDateTime.type,
+      departureDate: state.departureDateTime.date,
     });
     expect(state.isLoading).toBe(false);
     expect(state.error).toBeNull();
     expect(searchConnectionsMock).toHaveBeenCalled();
+  });
+
+  test("snapshots departure datetime onto resultsQuery", () => {
+    const date = new Date("2026-07-04T18:00:00");
+    useSearchStore.getState().setFromStop(thermalStop);
+    useSearchStore.getState().setToStop(puppStop);
+    useSearchStore.getState().setDepartureDateTime({
+      type: TypeOfDepartureDateTimeType.dateTime,
+      date,
+    });
+    searchConnectionsMock.mockReturnValue([searchResult]);
+
+    runConnectionSearch();
+
+    expect(useSearchStore.getState().resultsQuery).toEqual({
+      fromStopId: thermalStop.id,
+      toStopId: puppStop.id,
+      departureType: TypeOfDepartureDateTimeType.dateTime,
+      departureDate: date,
+    });
   });
 
   test("maps AppError onto the search store", () => {
@@ -84,6 +107,8 @@ describe("runConnectionSearch", () => {
     expect(state.resultsQuery).toEqual({
       fromStopId: thermalStop.id,
       toStopId: puppStop.id,
+      departureType: state.departureDateTime.type,
+      departureDate: state.departureDateTime.date,
     });
     expect(state.isLoading).toBe(false);
   });

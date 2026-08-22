@@ -12,7 +12,12 @@ export function runConnectionSearch() {
   const toStopId = toStop?.id;
   const resultsQuery =
     fromStopId != null && toStopId != null
-      ? { fromStopId, toStopId }
+      ? {
+          fromStopId,
+          toStopId,
+          departureType: departureDateTime.type,
+          departureDate: departureDateTime.date,
+        }
       : null;
 
   useSearchStore.setState({ isLoading: true, error: null });

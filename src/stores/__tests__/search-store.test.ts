@@ -45,7 +45,12 @@ describe("useSearchStore", () => {
     store.setToStop(puppStop);
     useSearchStore.setState({
       results: [sampleResult],
-      resultsQuery: { fromStopId: thermalStop.id, toStopId: puppStop.id },
+      resultsQuery: {
+        fromStopId: thermalStop.id,
+        toStopId: puppStop.id,
+        departureType: TypeOfDepartureDateTimeType.now,
+        departureDate: null,
+      },
       error: ErrorCode.SearchFailed,
     });
 
@@ -62,7 +67,12 @@ describe("useSearchStore", () => {
   test("setFromStop and setToStop clear previous results", () => {
     useSearchStore.setState({
       results: [sampleResult],
-      resultsQuery: { fromStopId: 1, toStopId: 2 },
+      resultsQuery: {
+        fromStopId: 1,
+        toStopId: 2,
+        departureType: TypeOfDepartureDateTimeType.now,
+        departureDate: null,
+      },
       error: ErrorCode.Unknown,
     });
 
@@ -75,7 +85,12 @@ describe("useSearchStore", () => {
 
     useSearchStore.setState({
       results: [sampleResult],
-      resultsQuery: { fromStopId: 1, toStopId: 2 },
+      resultsQuery: {
+        fromStopId: 1,
+        toStopId: 2,
+        departureType: TypeOfDepartureDateTimeType.now,
+        departureDate: null,
+      },
     });
 
     useSearchStore.getState().setToStop(puppStop);
@@ -84,7 +99,18 @@ describe("useSearchStore", () => {
     expect(useSearchStore.getState().toStop).toEqual(puppStop);
   });
 
-  test("setDepartureDateTime merges type and date", () => {
+  test("setDepartureDateTime merges type and date and clears results", () => {
+    useSearchStore.setState({
+      results: [sampleResult],
+      resultsQuery: {
+        fromStopId: 1,
+        toStopId: 2,
+        departureType: TypeOfDepartureDateTimeType.now,
+        departureDate: null,
+      },
+      error: ErrorCode.Unknown,
+    });
+
     useSearchStore.getState().setDepartureDateTime({
       type: TypeOfDepartureDateTimeType.dateTime,
     });
@@ -92,6 +118,19 @@ describe("useSearchStore", () => {
       TypeOfDepartureDateTimeType.dateTime,
     );
     expect(useSearchStore.getState().departureDateTime.date).toBeNull();
+    expect(useSearchStore.getState().results).toEqual([]);
+    expect(useSearchStore.getState().resultsQuery).toBeNull();
+    expect(useSearchStore.getState().error).toBeNull();
+
+    useSearchStore.setState({
+      results: [sampleResult],
+      resultsQuery: {
+        fromStopId: 1,
+        toStopId: 2,
+        departureType: TypeOfDepartureDateTimeType.dateTime,
+        departureDate: null,
+      },
+    });
 
     const date = new Date("2026-07-04T10:00:00");
     useSearchStore.getState().setDepartureDateTime({ date });
@@ -100,6 +139,29 @@ describe("useSearchStore", () => {
       type: TypeOfDepartureDateTimeType.dateTime,
       date,
     });
+    expect(useSearchStore.getState().results).toEqual([]);
+    expect(useSearchStore.getState().resultsQuery).toBeNull();
+  });
+
+  test("setDepartureDateTime keeps results when the value is unchanged", () => {
+    const resultsQuery = {
+      fromStopId: 1,
+      toStopId: 2,
+      departureType: TypeOfDepartureDateTimeType.now,
+      departureDate: null,
+    };
+    useSearchStore.setState({
+      results: [sampleResult],
+      resultsQuery,
+    });
+
+    useSearchStore.getState().setDepartureDateTime({
+      type: TypeOfDepartureDateTimeType.now,
+      date: null,
+    });
+
+    expect(useSearchStore.getState().results).toEqual([sampleResult]);
+    expect(useSearchStore.getState().resultsQuery).toEqual(resultsQuery);
   });
 
   test("reset restores default now departure", () => {

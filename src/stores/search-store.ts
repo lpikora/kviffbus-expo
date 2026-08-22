@@ -20,6 +20,8 @@ const APP_BUILD_NUMBER = Number(
 export interface ResultsQuery {
   fromStopId: number;
   toStopId: number;
+  departureType: TypeOfDepartureDateTimeType;
+  departureDate: Date | null;
 }
 
 export interface SearchStoreState {
@@ -77,12 +79,26 @@ export const useSearchStore = create<SearchStore>()(
           error: null,
         }),
       setDepartureDateTime: (departureDateTime) =>
-        set((state) => ({
-          departureDateTime: {
+        set((state) => {
+          const nextDepartureDateTime = {
             ...state.departureDateTime,
             ...departureDateTime,
-          },
-        })),
+          };
+          const sameType =
+            nextDepartureDateTime.type === state.departureDateTime.type;
+          const sameDate =
+            nextDepartureDateTime.date?.getTime() ===
+            state.departureDateTime.date?.getTime();
+          if (sameType && sameDate) {
+            return { departureDateTime: nextDepartureDateTime };
+          }
+          return {
+            departureDateTime: nextDepartureDateTime,
+            results: [],
+            resultsQuery: null,
+            error: null,
+          };
+        }),
       setError: (error) => set({ error }),
       swapStops: () =>
         set((state) => ({

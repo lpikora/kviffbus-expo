@@ -24,23 +24,32 @@ function keyExtractor(item: ConnectionResult) {
 export default function ResultsScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { results, resultsQuery, fromStop, toStop, error, isLoading } =
-    useSearchStore(
-      useShallow((state) => ({
-        results: state.results,
-        resultsQuery: state.resultsQuery,
-        fromStop: state.fromStop,
-        toStop: state.toStop,
-        error: state.error,
-        isLoading: state.isLoading,
-      })),
-    );
+  const {
+    results,
+    resultsQuery,
+    fromStop,
+    toStop,
+    departureDateTime,
+    error,
+    isLoading,
+  } = useSearchStore(
+    useShallow((state) => ({
+      results: state.results,
+      resultsQuery: state.resultsQuery,
+      fromStop: state.fromStop,
+      toStop: state.toStop,
+      departureDateTime: state.departureDateTime,
+      error: state.error,
+      isLoading: state.isLoading,
+    })),
+  );
 
   const fromName = fromStop?.name ?? "";
   const toName = toStop?.name ?? "";
   const visibleResults = resultsMatchQuery(
     fromStop?.id,
     toStop?.id,
+    departureDateTime,
     resultsQuery,
   )
     ? results
