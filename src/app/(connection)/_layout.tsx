@@ -8,7 +8,10 @@ export default function ConnectionLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="results"
-        options={{ title: t("HomeScreen.connections") }}
+        options={{
+          title: t("HomeScreen.connections"),
+          headerBackButtonDisplayMode: "minimal",
+        }}
       />
       <Stack.Screen
         name="stop-picker"
