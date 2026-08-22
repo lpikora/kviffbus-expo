@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AppText } from "@/components/app-text";
 import { StopPickerItem } from "@/components/stop-picker-item";
 import { MaxContentWidth, radius, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -71,23 +70,6 @@ export default function StopPickerScreen() {
         },
       ]}
     >
-      <Pressable
-        style={({ pressed }) => [styles.mapButton, pressed && styles.pressed]}
-        onPress={() => router.navigate("/map")}
-        accessibilityRole="button"
-        accessibilityLabel={t("selectStopFromMapScreen.openMap")}
-      >
-        <View
-          style={[
-            styles.mapButtonInner,
-            { backgroundColor: theme.colors.bgSubtle },
-          ]}
-        >
-          <AppText variant="caption" tone="accent">
-            {t("selectStopFromMapScreen.openMap")}
-          </AppText>
-        </View>
-      </Pressable>
       {stops.map((stop) => (
         <StopPickerItem
           key={stop.id}

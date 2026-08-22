@@ -8,6 +8,13 @@ export function runConnectionSearch() {
   const { connections, stops, stopExceptions, appConfig } =
     useDataStore.getState();
 
+  const fromStopId = fromStop?.id;
+  const toStopId = toStop?.id;
+  const resultsQuery =
+    fromStopId != null && toStopId != null
+      ? { fromStopId, toStopId }
+      : null;
+
   useSearchStore.setState({ isLoading: true, error: null });
   try {
     const results = searchConnections(
@@ -22,9 +29,13 @@ export function runConnectionSearch() {
       },
     );
 
-    useSearchStore.setState({ results });
+    useSearchStore.setState({ results, resultsQuery });
   } catch (error) {
-    useSearchStore.setState({ results: [], error: toErrorCode(error) });
+    useSearchStore.setState({
+      results: [],
+      resultsQuery,
+      error: toErrorCode(error),
+    });
     console.warn("Error in runConnectionSearch", error);
   } finally {
     useSearchStore.setState({ isLoading: false });

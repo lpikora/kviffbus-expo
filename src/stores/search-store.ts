@@ -17,11 +17,17 @@ const APP_BUILD_NUMBER = Number(
     1,
 );
 
+export interface ResultsQuery {
+  fromStopId: number;
+  toStopId: number;
+}
+
 export interface SearchStoreState {
   fromStop: StopDto | null;
   toStop: StopDto | null;
   departureDateTime: DepartureDateTimeType;
   results: ConnectionResult[];
+  resultsQuery: ResultsQuery | null;
   isLoading: boolean;
   error: ErrorCode | null;
 }
@@ -47,6 +53,7 @@ export const searchStoreDefaultValues: SearchStoreState = {
     date: null,
   },
   results: [],
+  resultsQuery: null,
   isLoading: false,
   error: null,
 };
@@ -55,8 +62,20 @@ export const useSearchStore = create<SearchStore>()(
   persist(
     (set) => ({
       ...searchStoreDefaultValues,
-      setFromStop: (fromStop) => set({ fromStop }),
-      setToStop: (toStop) => set({ toStop }),
+      setFromStop: (fromStop) =>
+        set({
+          fromStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
+        }),
+      setToStop: (toStop) =>
+        set({
+          toStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
+        }),
       setDepartureDateTime: (departureDateTime) =>
         set((state) => ({
           departureDateTime: {
@@ -69,6 +88,9 @@ export const useSearchStore = create<SearchStore>()(
         set((state) => ({
           fromStop: state.toStop,
           toStop: state.fromStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
         })),
       reset: () => set(searchStoreDefaultValues),
     }),

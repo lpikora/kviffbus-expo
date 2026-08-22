@@ -20,10 +20,7 @@ import { useDataStore } from "@/stores/data-store";
 export default function AboutScreen() {
   const { t } = useTranslation();
   const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + space[16],
-  };
+  const bottomInset = safeAreaInsets.bottom + BottomTabInset + space[16];
   const theme = useTheme();
   const appConfig = useDataStore((state) => state.appConfig);
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
@@ -31,17 +28,15 @@ export default function AboutScreen() {
   const contentPlatformStyle =
     Platform.OS === "android"
       ? {
-          paddingTop: insets.top,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
-          paddingBottom: insets.bottom,
+          paddingLeft: safeAreaInsets.left,
+          paddingRight: safeAreaInsets.right,
+          paddingBottom: bottomInset,
         }
       : undefined;
 
   return (
     <ScrollView
       style={[styles.scrollView, { backgroundColor: theme.colors.bg }]}
-      contentInset={insets}
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}
     >
       <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
@@ -101,6 +96,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
+    paddingTop: space[16],
     flexDirection: "row",
     justifyContent: "center",
   },

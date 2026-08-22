@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { runConnectionSearch } from "@/actions/run-connection-search";
 import { AppText } from "@/components/app-text";
 import { DateTimePicker } from "@/components/date-time-picker/index";
 import { ErrorMessage } from "@/components/error-message";
 import { BottomTabInset, MaxContentWidth, radius, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { runConnectionSearch } from "@/actions/run-connection-search";
 import { useSearchStore } from "@/stores/search-store";
 import { ErrorCode } from "@/types/appError";
 
@@ -29,9 +29,6 @@ export default function ConnectionScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
       <SafeAreaView style={styles.safeArea}>
-        <AppText variant="title" style={styles.title}>
-          {t("HomeScreen.title")}
-        </AppText>
         {error ? <ErrorMessage code={error} /> : null}
 
         <View
@@ -137,11 +134,12 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
+    paddingTop: space[16],
     paddingHorizontal: space[24],
     gap: space[16],
     paddingBottom: BottomTabInset + space[16],
     maxWidth: MaxContentWidth,
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   title: {
     marginBottom: space[8],
