@@ -36,7 +36,7 @@ export default {
     LinkToMapImage: "Detailed bus stop map",
     LinkToOfficialTransport: "Festival transport",
   },
-  momentCalendarTranslations: {
+  calendarTranslations: {
     lastDay: "[Yesterday at] H:mm",
     sameDay: "[Today at] H:mm",
     nextDay: "[Tomorrow at] H:mm",

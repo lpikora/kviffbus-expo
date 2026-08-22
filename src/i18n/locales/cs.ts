@@ -37,7 +37,7 @@ export default {
     LinkToMapImage: "Podrobná mapa zastávek",
     LinkToOfficialTransport: "Festivalová doprava",
   },
-  momentCalendarTranslations: {
+  calendarTranslations: {
     lastDay: "[Včera v] H:mm",
     sameDay: "[Dnes v] H:mm",
     nextDay: "[Zítra v] H:mm",

@@ -1,5 +1,5 @@
 import i18n from "@/i18n";
-import moment from "moment";
+import dayjs from "@/utils/dayjs";
 
 export function toDateKey(date: Date) {
   const year = date.getFullYear();
@@ -21,18 +21,18 @@ export function getDateTimeStringFromNowToDate(date: Date) {
   const m = Math.floor((seconds % 3600) / 60);
 
   if (toDateKey(nowDate) !== toDateKey(date)) {
-    return moment(date).calendar(undefined, {
-      lastDay: i18n.t("momentCalendarTranslations.lastDay"),
-      sameDay: i18n.t("momentCalendarTranslations.sameDay"),
-      nextDay: i18n.t("momentCalendarTranslations.nextDay"),
-      lastWeek: i18n.t("momentCalendarTranslations.lastWeek"),
-      nextWeek: i18n.t("momentCalendarTranslations.nextWeek"),
-      sameElse: i18n.t("momentCalendarTranslations.sameElse"),
+    return dayjs(date).calendar(undefined, {
+      lastDay: i18n.t("calendarTranslations.lastDay"),
+      sameDay: i18n.t("calendarTranslations.sameDay"),
+      nextDay: i18n.t("calendarTranslations.nextDay"),
+      lastWeek: i18n.t("calendarTranslations.lastWeek"),
+      nextWeek: i18n.t("calendarTranslations.nextWeek"),
+      sameElse: i18n.t("calendarTranslations.sameElse"),
     });
   }
 
   if (h <= 0) {
-    return moment().to(date);
+    return dayjs().to(date);
   }
 
   return `${i18n.t("time.in")} ${h} h ${m} min`;
