@@ -54,4 +54,13 @@ describe("getDateTimeStringFromNowToDate", () => {
     expect(label).not.toContain("h");
     expect(label.length).toBeGreaterThan(0);
   });
+
+  test("uses relative time for a same-day departure under an hour", () => {
+    const label = getDateTimeStringFromNowToDate(
+      new Date(2026, 6, 4, 10, 30, 0),
+    );
+
+    expect(label).not.toMatch(/\d+ h \d+ min/);
+    expect(label.length).toBeGreaterThan(0);
+  });
 });

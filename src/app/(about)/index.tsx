@@ -1,8 +1,8 @@
 import Constants from "expo-constants";
 import { Href } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Linking, Platform, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
 
 import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
@@ -63,11 +63,6 @@ export default function AboutScreen() {
 
         {appConfig ? (
           <ThemedView style={styles.links}>
-            <ExternalLink href={appConfig.timetablesPdfUrl as Href & string}>
-              <ThemedText type="linkPrimary">
-                {t("Drawer.LinkToPdfTimetable")}
-              </ThemedText>
-            </ExternalLink>
             <ExternalLink href={appConfig.busStopsMapImageUrl as Href & string}>
               <ThemedText type="linkPrimary">
                 {t("Drawer.LinkToMapImage")}

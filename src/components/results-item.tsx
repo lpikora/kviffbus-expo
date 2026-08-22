@@ -2,9 +2,9 @@ import { memo } from "react";
 import { StyleSheet } from "react-native";
 
 import { Spacing } from "@/constants/theme";
+import { useTimeToDepartureLabel } from "@/hooks/use-time-to-departure-label";
 import {
   formatMinutesToHhMm,
-  getDateTimeStringFromNowToDate,
   getDurationBetweenTwoTimes,
 } from "@/utils/format-time";
 import { BusIcon } from "./bus-icon";
@@ -28,7 +28,7 @@ export const ResultsListItem = memo(function ResultsListItem({
   toName,
   departureDate,
 }: Props) {
-  const timeToDeparture = getDateTimeStringFromNowToDate(departureDate);
+  const timeToDeparture = useTimeToDepartureLabel(departureDate);
   const durationTime = getDurationBetweenTwoTimes(timeDeparture, timeArrival);
   const departureLabel = formatMinutesToHhMm(timeDeparture);
   const arrivalLabel = formatMinutesToHhMm(timeArrival);
