@@ -20,7 +20,8 @@ jest.mock("@/services/data-service", () => ({
   getRemoteData: jest.fn(),
 }));
 
-import { useDataStore } from "@/stores/data-store";
+import { dataStoreDefaultValues, useDataStore } from "@/stores/data-store";
+import { APP_BUILD_NUMBER } from "@/stores/persist-version";
 import { useSearchStore } from "@/stores/search-store";
 import { ErrorCode } from "@/types/appError";
 
@@ -196,6 +197,25 @@ describe("useDataStore", () => {
     await useDataStore.getState().syncWithApi();
 
     expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
+  });
+
+  test("rehydrate discards persist when stored version differs", async () => {
+    seedPersisted(persistedNewer);
+
+    const persisted = JSON.parse(
+      memoryStorage.getItem("kviffbus-store") ?? "{}",
+    );
+    expect(persisted.version).toBe(APP_BUILD_NUMBER);
+    persisted.version = APP_BUILD_NUMBER - 1;
+    memoryStorage.setItem("kviffbus-store", JSON.stringify(persisted));
+
+    await useDataStore.persist.rehydrate();
+
+    expect(useDataStore.getState()).toMatchObject(dataStoreDefaultValues);
+    expect(JSON.parse(memoryStorage.getItem("kviffbus-store") ?? "{}")).toEqual({
+      state: dataStoreDefaultValues,
+      version: APP_BUILD_NUMBER,
+    });
   });
 
   test("syncWithApi applies remote data when persist has no appConfig", async () => {

@@ -10,6 +10,7 @@ jest.mock("@/services/storage", () => {
   return { clientStorage: createMemoryStorage() };
 });
 
+import { APP_BUILD_NUMBER } from "@/stores/persist-version";
 import {
   searchStoreDefaultValues,
   useSearchStore,
@@ -210,5 +211,29 @@ describe("useSearchStore", () => {
     expect(useSearchStore.getState().toStop).toEqual(puppStop);
     expect(useSearchStore.getState().results).toEqual([]);
     expect(useSearchStore.getState().error).toBeNull();
+  });
+
+  test("rehydrate discards persist when stored version differs", async () => {
+    useSearchStore.getState().setFromStop(thermalStop);
+    useSearchStore.getState().setToStop(puppStop);
+    await flushPersistWrites();
+
+    const persisted = JSON.parse(
+      memoryStorage.getItem("kviffbus-search") ?? "{}",
+    );
+    expect(persisted.version).toBe(APP_BUILD_NUMBER);
+    persisted.version = APP_BUILD_NUMBER - 1;
+    memoryStorage.setItem("kviffbus-search", JSON.stringify(persisted));
+
+    await useSearchStore.persist.rehydrate();
+
+    expect(useSearchStore.getState()).toMatchObject(searchStoreDefaultValues);
+    expect(JSON.parse(memoryStorage.getItem("kviffbus-search") ?? "{}")).toEqual({
+      state: {
+        fromStop: null,
+        toStop: null,
+      },
+      version: APP_BUILD_NUMBER,
+    });
   });
 });

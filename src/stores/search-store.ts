@@ -6,16 +6,10 @@ import {
   TypeOfDepartureDateTimeType,
 } from "@/types/departureDateTimeType";
 import { StopDto } from "@/types/stopDto";
-import Constants from "expo-constants";
+import { discardPersistedOnVersionBump } from "@/stores/persist-version";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-const APP_BUILD_NUMBER = Number(
-  Constants.expoConfig?.android?.versionCode ??
-    Constants.expoConfig?.ios?.buildNumber ??
-    1,
-);
 
 export interface ResultsQuery {
   fromStopId: number;
@@ -112,7 +106,7 @@ export const useSearchStore = create<SearchStore>()(
     }),
     {
       name: "kviffbus-search",
-      version: APP_BUILD_NUMBER,
+      ...discardPersistedOnVersionBump(searchStoreDefaultValues),
       storage: createJSONStorage(() => clientStorage),
       partialize: (state) => ({
         fromStop: state.fromStop,

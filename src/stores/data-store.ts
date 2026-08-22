@@ -1,5 +1,6 @@
 import { getLocalData, getRemoteData } from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
+import { discardPersistedOnVersionBump } from "@/stores/persist-version";
 import { useSearchStore } from "@/stores/search-store";
 import { ErrorCode } from "@/types/appError";
 import { isNewerImportVersion } from "@/utils/import-version";
@@ -7,16 +8,9 @@ import { AppConfigDto } from "@/types/appConfigDto";
 import { ConnectionsMap } from "@/types/connectionDto";
 import { StopDto } from "@/types/stopDto";
 import { StopExceptionDto } from "@/types/stopExceptionDto";
-import Constants from "expo-constants";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-const APP_BUILD_NUMBER = Number(
-  Constants.expoConfig?.android?.versionCode ??
-    Constants.expoConfig?.ios?.buildNumber ??
-    1,
-);
 
 export interface DataStoreState {
   stops: StopDto[];
@@ -118,7 +112,7 @@ export const useDataStore = create<DataStore>()(
     }),
     {
       name: "kviffbus-store",
-      version: APP_BUILD_NUMBER,
+      ...discardPersistedOnVersionBump(dataStoreDefaultValues),
       storage: createJSONStorage(() => clientStorage),
       partialize: (state) => ({
         stops: state.stops,
