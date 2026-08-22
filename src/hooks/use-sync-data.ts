@@ -5,8 +5,6 @@ import { toErrorCode } from "@/errors/appError";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 
-const HYDRATION_TIMEOUT_MS = 3000;
-
 function waitForStoreHydration(persist: {
   hasHydrated: () => boolean;
   onFinishHydration: (fn: () => void) => () => void;
@@ -18,7 +16,6 @@ function waitForStoreHydration(persist: {
     }
 
     let settled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     let unsub = () => {};
 
     const finish = () => {
@@ -26,19 +23,11 @@ function waitForStoreHydration(persist: {
         return;
       }
       settled = true;
-      if (timeoutId !== undefined) {
-        clearTimeout(timeoutId);
-      }
       unsub();
       resolve();
     };
 
     unsub = persist.onFinishHydration(finish);
-
-    timeoutId = setTimeout(() => {
-      console.warn("Store hydration timed out");
-      finish();
-    }, HYDRATION_TIMEOUT_MS);
 
     if (persist.hasHydrated()) {
       finish();
