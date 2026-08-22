@@ -53,6 +53,8 @@
     "android": "expo run:android",
     "android:clean": "expo run:android --clean",
     "ios": "expo run:ios",
+    "ios:prebuild": "expo prebuild --platform ios",
+    "android:prebuild": "expo prebuild --platform android",
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll",

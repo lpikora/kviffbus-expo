@@ -46,11 +46,7 @@ export function DateTimePicker({
 
   return (
     <>
-      <DateTimePickerTrigger
-        label={t("selectTime.pickerTitle")}
-        value={displayText}
-        onPress={openPicker}
-      />
+      <DateTimePickerTrigger value={displayText} onPress={openPicker} />
 
       <Modal transparent animationType="slide" visible={showPicker}>
         <View style={styles.modalOverlay}>

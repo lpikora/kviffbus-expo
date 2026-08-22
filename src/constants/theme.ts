@@ -3,13 +3,15 @@ import { Platform } from "react-native";
 export const palette = {
   white: "#ffffff",
   black: "#000000",
+  navy: "#08111f",
+  navyElevated: "#1f2936",
+  graySelectedDark: "#2f2f31",
+  grayBorderDark: "#3B3B3B",
+  grayMuted: "#929198",
+  grayMutedLight: "#60646C",
   gray2: "#F0F0F3",
   gray4: "#E0E1E6",
-  gray8: "#60646C",
-  gray2Dark: "#212225",
-  gray4Dark: "#2E3135",
-  gray8Dark: "#B0B4BA",
-  blue: "#3c87f7",
+  blue: "#2c70e0",
 } as const;
 
 export const space = {
@@ -65,7 +67,7 @@ export const themes = {
     scheme: "light" as const,
     colors: {
       fg: palette.black,
-      fgMuted: palette.gray8,
+      fgMuted: palette.grayMutedLight,
       bg: palette.white,
       bgSubtle: palette.gray2,
       bgSelected: palette.gray4,
@@ -78,12 +80,12 @@ export const themes = {
     scheme: "dark" as const,
     colors: {
       fg: palette.white,
-      fgMuted: palette.gray8Dark,
-      bg: palette.black,
-      bgSubtle: palette.gray2Dark,
-      bgSelected: palette.gray4Dark,
+      fgMuted: palette.grayMuted,
+      bg: palette.navy,
+      bgSubtle: palette.navyElevated,
+      bgSelected: palette.graySelectedDark,
       accent: palette.blue,
-      border: palette.gray4Dark,
+      border: palette.grayBorderDark,
     },
     ...shared,
   },

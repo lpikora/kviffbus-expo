@@ -4,9 +4,11 @@ import { radius, space } from "@/constants/theme";
 
 export const dateTimePickerStyles = StyleSheet.create({
   row: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: space[24],
     paddingVertical: space[16],
-    gap: space[4],
+    gap: space[8],
   },
   pressed: {
     opacity: 0.6,

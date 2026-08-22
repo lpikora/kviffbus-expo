@@ -3,14 +3,14 @@ import { StyleSheet, View } from "react-native";
 
 import { AppText } from "@/components/app-text";
 import { radius, space } from "@/constants/theme";
-import { useTimeToDepartureLabel } from "@/hooks/use-time-to-departure-label";
 import { useTheme } from "@/hooks/use-theme";
+import { useTimeToDepartureLabel } from "@/hooks/use-time-to-departure-label";
 import {
   formatMinutesToHhMm,
   getDurationBetweenTwoTimes,
 } from "@/utils/format-time";
 
-import { BusIcon } from "./bus-icon";
+import { BusIcon } from "./icons/bus-icon";
 
 interface Props {
   timeDeparture: number;

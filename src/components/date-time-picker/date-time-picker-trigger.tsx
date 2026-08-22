@@ -1,17 +1,16 @@
 import { Pressable } from "react-native";
 
 import { AppText } from "@/components/app-text";
+import { ClockIcon } from "@/components/icons/clock-icon";
 
 import { dateTimePickerStyles as styles } from "./styles";
 
 type DateTimePickerTriggerProps = {
-  label: string;
   value: string;
   onPress: () => void;
 };
 
 export function DateTimePickerTrigger({
-  label,
   value,
   onPress,
 }: DateTimePickerTriggerProps) {
@@ -20,9 +19,7 @@ export function DateTimePickerTrigger({
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       onPress={onPress}
     >
-      <AppText variant="caption" tone="muted">
-        {label}
-      </AppText>
+      <ClockIcon />
       <AppText>{value}</AppText>
     </Pressable>
   );
