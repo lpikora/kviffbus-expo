@@ -1,9 +1,9 @@
 import { memo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { AppText } from "@/components/app-text";
+import { MaxContentWidth, radius, space } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { StopDto } from "@/types/stopDto";
 
 interface Props {
@@ -17,6 +17,8 @@ export const StopPickerItem = memo(function StopPickerItem({
   selected,
   onPress,
 }: Props) {
+  const theme = useTheme();
+
   return (
     <Pressable
       style={({ pressed }) => [styles.stopItem, pressed && styles.pressed]}
@@ -25,12 +27,18 @@ export const StopPickerItem = memo(function StopPickerItem({
       accessibilityState={{ selected }}
       accessibilityLabel={stop.name}
     >
-      <ThemedView
-        type={selected ? "backgroundSelected" : "backgroundElement"}
-        style={styles.stopCard}
+      <View
+        style={[
+          styles.stopCard,
+          {
+            backgroundColor: selected
+              ? theme.colors.bgSelected
+              : theme.colors.bgSubtle,
+          },
+        ]}
       >
-        <ThemedText type="default">{stop.name}</ThemedText>
-      </ThemedView>
+        <AppText>{stop.name}</AppText>
+      </View>
     </Pressable>
   );
 });
@@ -41,8 +49,8 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
   },
   stopCard: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
+    padding: space[16],
+    borderRadius: radius.md,
   },
   pressed: {
     opacity: 0.6,

@@ -1,13 +1,19 @@
 import Constants from "expo-constants";
 import { Href } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Linking, Platform, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppText } from "@/components/app-text";
 import { ExternalLink } from "@/components/external-link";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { BottomTabInset, MaxContentWidth, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 
@@ -16,64 +22,61 @@ export default function AboutScreen() {
   const safeAreaInsets = useSafeAreaInsets();
   const insets = {
     ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
+    bottom: safeAreaInsets.bottom + BottomTabInset + space[16],
   };
   const theme = useTheme();
   const appConfig = useDataStore((state) => state.appConfig);
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
 
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
-  });
+  const contentPlatformStyle =
+    Platform.OS === "android"
+      ? {
+          paddingTop: insets.top,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+          paddingBottom: insets.bottom,
+        }
+      : undefined;
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
+      style={[styles.scrollView, { backgroundColor: theme.colors.bg }]}
       contentInset={insets}
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}
     >
-      <ThemedView style={styles.container}>
-        <ThemedText type="subtitle">{t("App.AppName")}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
+      <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
+        <AppText variant="subtitle">{t("App.AppName")}</AppText>
+        <AppText variant="caption" tone="muted">
           {t("App.AppVersion")} {appVersion}
           {appConfig?.importVersion
             ? ` · ${t("App.TimetablesVersion")} ${appConfig.importVersion}`
             : ""}
-        </ThemedText>
+        </AppText>
 
         {appConfig?.festivalEditionNumber && appConfig.festivalYear ? (
-          <ThemedText>
+          <AppText>
             {t("HomeScreen.info.line1", {
               edition: appConfig.festivalEditionNumber,
               year: appConfig.festivalYear,
             })}
-          </ThemedText>
+          </AppText>
         ) : null}
 
-        <ThemedText>{t("InfoBanner.description")}</ThemedText>
+        <AppText>{t("InfoBanner.description")}</AppText>
 
         {appConfig ? (
-          <ThemedView style={styles.links}>
+          <View style={[styles.links, { backgroundColor: theme.colors.bg }]}>
             <ExternalLink href={appConfig.busStopsMapImageUrl as Href & string}>
-              <ThemedText type="linkPrimary">
+              <AppText variant="caption" tone="accent">
                 {t("Drawer.LinkToMapImage")}
-              </ThemedText>
+              </AppText>
             </ExternalLink>
             <ExternalLink
               href={appConfig.officialKViffWebTransportUrl as Href & string}
             >
-              <ThemedText type="linkPrimary">
+              <AppText variant="caption" tone="accent">
                 {t("Drawer.LinkToOfficialTransport")}
-              </ThemedText>
+              </AppText>
             </ExternalLink>
             {appConfig.contactEmail ? (
               <Pressable
@@ -81,14 +84,14 @@ export default function AboutScreen() {
                   void Linking.openURL(`mailto:${appConfig.contactEmail}`)
                 }
               >
-                <ThemedText type="linkPrimary">
+                <AppText variant="caption" tone="accent">
                   {t("App.Contact")}: {appConfig.contactEmail}
-                </ThemedText>
+                </AppText>
               </Pressable>
             ) : null}
-          </ThemedView>
+          </View>
         ) : null}
-      </ThemedView>
+      </View>
     </ScrollView>
   );
 }
@@ -104,11 +107,11 @@ const styles = StyleSheet.create({
   container: {
     maxWidth: MaxContentWidth,
     flexGrow: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
+    paddingHorizontal: space[24],
+    gap: space[16],
   },
   links: {
-    gap: Spacing.two,
-    paddingTop: Spacing.two,
+    gap: space[8],
+    paddingTop: space[8],
   },
 });

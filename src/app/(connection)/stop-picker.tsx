@@ -1,13 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppText } from "@/components/app-text";
 import { StopPickerItem } from "@/components/stop-picker-item";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { MaxContentWidth, radius, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
@@ -60,15 +59,15 @@ export default function StopPickerScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: theme.background }]}
+      style={[styles.container, { backgroundColor: theme.colors.bg }]}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       contentInset={{ bottom: insets.bottom }}
       contentContainerStyle={[
         styles.list,
         {
-          paddingTop: Spacing.two,
-          paddingBottom: insets.bottom + Spacing.six,
+          paddingTop: space[8],
+          paddingBottom: insets.bottom + space[64],
         },
       ]}
     >
@@ -78,11 +77,16 @@ export default function StopPickerScreen() {
         accessibilityRole="button"
         accessibilityLabel={t("selectStopFromMapScreen.openMap")}
       >
-        <ThemedView type="backgroundElement" style={styles.mapButtonInner}>
-          <ThemedText type="linkPrimary">
+        <View
+          style={[
+            styles.mapButtonInner,
+            { backgroundColor: theme.colors.bgSubtle },
+          ]}
+        >
+          <AppText variant="caption" tone="accent">
             {t("selectStopFromMapScreen.openMap")}
-          </ThemedText>
-        </ThemedView>
+          </AppText>
+        </View>
       </Pressable>
       {stops.map((stop) => (
         <StopPickerItem
@@ -101,8 +105,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   list: {
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.two,
+    paddingHorizontal: space[24],
+    gap: space[8],
     alignItems: "center",
     maxWidth: MaxContentWidth,
     alignSelf: "center",
@@ -113,8 +117,8 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
   },
   mapButtonInner: {
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
+    padding: space[16],
+    borderRadius: radius.md,
     alignItems: "center",
   },
   pressed: {

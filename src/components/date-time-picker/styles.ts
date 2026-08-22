@@ -1,12 +1,12 @@
 import { StyleSheet } from "react-native";
 
-import { Spacing } from "@/constants/theme";
+import { radius, space } from "@/constants/theme";
 
 export const dateTimePickerStyles = StyleSheet.create({
   row: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    gap: Spacing.one,
+    paddingHorizontal: space[24],
+    paddingVertical: space[16],
+    gap: space[4],
   },
   pressed: {
     opacity: 0.6,
@@ -17,18 +17,18 @@ export const dateTimePickerStyles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   modalContent: {
-    borderTopLeftRadius: Spacing.four,
-    borderTopRightRadius: Spacing.four,
-    paddingBottom: Spacing.four,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    paddingBottom: space[24],
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.two,
+    paddingHorizontal: space[24],
+    paddingTop: space[8],
   },
   modalButton: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
+    paddingVertical: space[8],
+    paddingHorizontal: space[16],
   },
 });

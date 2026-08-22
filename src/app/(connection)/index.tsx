@@ -1,18 +1,17 @@
 import { router } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import { DateTimePicker } from "@/components/date-time-picker/index";
-import { ErrorMessage } from "@/components/error-message";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
-import { useTheme } from "@/hooks/use-theme";
-import { runConnectionSearch } from "@/stores/run-connection-search";
-import { useSearchStore } from "@/stores/search-store";
-import { ErrorCode } from "@/types/appError";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
+import { Pressable, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { AppText } from "@/components/app-text";
+import { DateTimePicker } from "@/components/date-time-picker/index";
+import { ErrorMessage } from "@/components/error-message";
+import { BottomTabInset, MaxContentWidth, radius, space } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { runConnectionSearch } from "@/actions/run-connection-search";
+import { useSearchStore } from "@/stores/search-store";
+import { ErrorCode } from "@/types/appError";
 
 export default function ConnectionScreen() {
   const { t } = useTranslation();
@@ -28,16 +27,25 @@ export default function ConnectionScreen() {
   const error = useSearchStore((state) => state.error);
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedText type="title" style={styles.title}>
+        <AppText variant="title" style={styles.title}>
           {t("HomeScreen.title")}
-        </ThemedText>
+        </AppText>
         {error ? <ErrorMessage code={error} /> : null}
 
-        <ThemedView type="backgroundElement" style={styles.card}>
-          <ThemedView style={styles.cardContent}>
-            <ThemedView style={styles.inputsColumn}>
+        <View
+          style={[styles.card, { backgroundColor: theme.colors.bgSubtle }]}
+        >
+          <View
+            style={[styles.cardContent, { backgroundColor: theme.colors.bg }]}
+          >
+            <View
+              style={[
+                styles.inputsColumn,
+                { backgroundColor: theme.colors.bg },
+              ]}
+            >
               <Pressable
                 style={({ pressed }) => [
                   styles.stopRow,
@@ -45,15 +53,15 @@ export default function ConnectionScreen() {
                 ]}
                 onPress={() => router.navigate("/stop-picker?field=from")}
               >
-                <ThemedText themeColor="textSecondary" type="small">
+                <AppText variant="caption" tone="muted">
                   {t("StopTextInput.from")}
-                </ThemedText>
-                <ThemedText type="defaultBold">
+                </AppText>
+                <AppText variant="bodyBold">
                   {fromStop ? fromStop.name : t("StopTextInput.selectStop")}
-                </ThemedText>
+                </AppText>
               </Pressable>
 
-              <ThemedView style={styles.divider} />
+              <View style={styles.divider} />
 
               <Pressable
                 style={({ pressed }) => [
@@ -62,14 +70,14 @@ export default function ConnectionScreen() {
                 ]}
                 onPress={() => router.navigate("/stop-picker?field=to")}
               >
-                <ThemedText themeColor="textSecondary" type="small">
+                <AppText variant="caption" tone="muted">
                   {t("StopTextInput.to")}
-                </ThemedText>
-                <ThemedText type="defaultBold">
+                </AppText>
+                <AppText variant="bodyBold">
                   {toStop ? toStop.name : t("StopTextInput.selectStop")}
-                </ThemedText>
+                </AppText>
               </Pressable>
-            </ThemedView>
+            </View>
 
             <Pressable
               style={({ pressed }) => [
@@ -79,25 +87,24 @@ export default function ConnectionScreen() {
               onPress={swapStops}
             >
               <SymbolView
-                tintColor={theme.text}
+                tintColor={theme.colors.fg}
                 name={{
                   ios: "arrow.up.arrow.down",
                   android: "swap_vert",
-                  web: "swap_vert",
                 }}
                 size={24}
               />
             </Pressable>
-          </ThemedView>
-        </ThemedView>
+          </View>
+        </View>
 
-        <ThemedView type="backgroundElement" style={styles.card}>
+        <View style={[styles.card, { backgroundColor: theme.colors.bgSubtle }]}>
           <DateTimePicker
             value={departureDateTime}
             onChange={setDepartureDateTime}
             minimumDate={new Date()}
           />
-        </ThemedView>
+        </View>
 
         <Pressable
           style={({ pressed }) => [
@@ -113,12 +120,12 @@ export default function ConnectionScreen() {
             router.navigate("/results");
           }}
         >
-          <ThemedText style={styles.searchButtonText} type="defaultBold">
+          <AppText variant="bodyBold" style={styles.searchButtonText}>
             {t("SearchButton.search")}
-          </ThemedText>
+          </AppText>
         </Pressable>
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -130,17 +137,17 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
+    paddingHorizontal: space[24],
+    gap: space[16],
+    paddingBottom: BottomTabInset + space[16],
     maxWidth: MaxContentWidth,
     justifyContent: "center",
   },
   title: {
-    marginBottom: Spacing.two,
+    marginBottom: space[8],
   },
   card: {
-    borderRadius: Spacing.four,
+    borderRadius: radius.lg,
     overflow: "hidden",
   },
   cardContent: {
@@ -151,17 +158,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stopRow: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    gap: Spacing.one,
+    paddingHorizontal: space[24],
+    paddingVertical: space[16],
+    gap: space[4],
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    marginHorizontal: Spacing.four,
+    marginHorizontal: space[24],
     backgroundColor: "rgba(128,128,128,0.2)",
   },
   swapButton: {
-    padding: Spacing.four,
+    padding: space[24],
     justifyContent: "center",
     alignItems: "center",
   },
@@ -169,9 +176,9 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   searchButton: {
-    marginTop: Spacing.two,
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.four,
+    marginTop: space[8],
+    paddingVertical: space[16],
+    borderRadius: radius.lg,
     backgroundColor: "#007AFF",
     alignItems: "center",
   },

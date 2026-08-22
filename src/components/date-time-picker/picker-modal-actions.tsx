@@ -1,6 +1,6 @@
 import { Pressable, View } from "react-native";
 
-import { ThemedText } from "@/components/themed-text";
+import { AppText } from "@/components/app-text";
 
 import { dateTimePickerStyles as styles } from "./styles";
 
@@ -23,13 +23,13 @@ export function PickerModalActions({
         style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
         onPress={onCancel}
       >
-        <ThemedText type="default">{cancelLabel}</ThemedText>
+        <AppText>{cancelLabel}</AppText>
       </Pressable>
       <Pressable
         style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
         onPress={onConfirm}
       >
-        <ThemedText type="default">{confirmLabel}</ThemedText>
+        <AppText>{confirmLabel}</AppText>
       </Pressable>
     </View>
   );

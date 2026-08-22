@@ -1,6 +1,6 @@
 import { Pressable } from "react-native";
 
-import { ThemedText } from "@/components/themed-text";
+import { AppText } from "@/components/app-text";
 
 import { dateTimePickerStyles as styles } from "./styles";
 
@@ -20,10 +20,10 @@ export function DateTimePickerTrigger({
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       onPress={onPress}
     >
-      <ThemedText themeColor="textSecondary" type="small">
+      <AppText variant="caption" tone="muted">
         {label}
-      </ThemedText>
-      <ThemedText type="default">{value}</ThemedText>
+      </AppText>
+      <AppText>{value}</AppText>
     </Pressable>
   );
 }

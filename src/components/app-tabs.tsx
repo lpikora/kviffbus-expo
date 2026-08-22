@@ -1,19 +1,17 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { useColorScheme } from "react-native";
-
-import { Colors } from "@/constants/theme";
 import { useTranslation } from "react-i18next";
 
+import { useTheme } from "@/hooks/use-theme";
+
 export default function AppTabs() {
-  const scheme = useColorScheme();
   const { t } = useTranslation();
-  const colors = Colors[scheme === "unspecified" ? "light" : scheme];
+  const { colors } = useTheme();
 
   return (
     <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}
+      backgroundColor={colors.bg}
+      indicatorColor={colors.bgSubtle}
+      labelStyle={{ selected: { color: colors.fg } }}
     >
       <NativeTabs.Trigger name="(connection)">
         <NativeTabs.Trigger.Label>

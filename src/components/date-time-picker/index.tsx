@@ -2,7 +2,7 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useState } from "react";
 import { Alert, Modal, useColorScheme, View } from "react-native";
 
-import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/hooks/use-theme";
 
 import { DateTimePickerTrigger } from "./date-time-picker-trigger";
 import { PickerModalActions } from "./picker-modal-actions";
@@ -19,6 +19,7 @@ export function DateTimePicker({
   maximumDate,
 }: DateTimePickerProps) {
   const colorScheme = useColorScheme();
+  const theme = useTheme();
   const [showPicker, setShowPicker] = useState(false);
   const [pickerDate, setPickerDate] = useState(() => value.date ?? new Date());
 
@@ -53,7 +54,12 @@ export function DateTimePicker({
 
       <Modal transparent animationType="slide" visible={showPicker}>
         <View style={styles.modalOverlay}>
-          <ThemedView type="backgroundElement" style={styles.modalContent}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: theme.colors.bgSubtle },
+            ]}
+          >
             <RNDateTimePicker
               value={pickerDate}
               mode="datetime"
@@ -69,7 +75,7 @@ export function DateTimePicker({
               onCancel={() => setShowPicker(false)}
               onConfirm={confirmPicker}
             />
-          </ThemedView>
+          </View>
         </View>
       </Modal>
     </>

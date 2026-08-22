@@ -1,15 +1,16 @@
 import { memo } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { Spacing } from "@/constants/theme";
+import { AppText } from "@/components/app-text";
+import { radius, space } from "@/constants/theme";
 import { useTimeToDepartureLabel } from "@/hooks/use-time-to-departure-label";
+import { useTheme } from "@/hooks/use-theme";
 import {
   formatMinutesToHhMm,
   getDurationBetweenTwoTimes,
 } from "@/utils/format-time";
+
 import { BusIcon } from "./bus-icon";
-import { ThemedText } from "./themed-text";
-import { ThemedView } from "./themed-view";
 
 interface Props {
   timeDeparture: number;
@@ -28,62 +29,76 @@ export const ResultsListItem = memo(function ResultsListItem({
   toName,
   departureDate,
 }: Props) {
+  const theme = useTheme();
   const timeToDeparture = useTimeToDepartureLabel(departureDate);
   const durationTime = getDurationBetweenTwoTimes(timeDeparture, timeArrival);
   const departureLabel = formatMinutesToHhMm(timeDeparture);
   const arrivalLabel = formatMinutesToHhMm(timeArrival);
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedView type="backgroundElement" style={styles.header}>
-        <ThemedText type="small" style={styles.timeToDeparture}>
+    <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.bgSubtle }]}>
+        <AppText variant="caption" style={styles.timeToDeparture}>
           {timeToDeparture}
-        </ThemedText>
-        <ThemedText
-          type="small"
-          themeColor="textSecondary"
-          style={styles.durationTime}
-        >
+        </AppText>
+        <AppText variant="caption" tone="muted" style={styles.durationTime}>
           {durationTime}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.body}>
-        <ThemedView style={styles.busIconContainer}>
+        </AppText>
+      </View>
+      <View style={[styles.body, { backgroundColor: theme.colors.bg }]}>
+        <View
+          style={[
+            styles.busIconContainer,
+            { backgroundColor: theme.colors.bg },
+          ]}
+        >
           <BusIcon />
-        </ThemedView>
-        <ThemedView style={styles.bodyContent}>
-          <ThemedText type="smallBold" style={styles.lineId}>
+        </View>
+        <View
+          style={[styles.bodyContent, { backgroundColor: theme.colors.bg }]}
+        >
+          <AppText variant="captionBold" style={styles.lineId}>
             {lineId}
-          </ThemedText>
-          <ThemedView style={styles.stopContainer}>
-            <ThemedText type="smallBold" style={styles.stopTime}>
+          </AppText>
+          <View
+            style={[
+              styles.stopContainer,
+              { backgroundColor: theme.colors.bg },
+            ]}
+          >
+            <AppText variant="captionBold" style={styles.stopTime}>
               {departureLabel}
-            </ThemedText>
-            <ThemedText type="small">{fromName}</ThemedText>
-          </ThemedView>
-          <ThemedView style={styles.stopContainer}>
-            <ThemedText type="smallBold" style={styles.stopTime}>
+            </AppText>
+            <AppText variant="caption">{fromName}</AppText>
+          </View>
+          <View
+            style={[
+              styles.stopContainer,
+              { backgroundColor: theme.colors.bg },
+            ]}
+          >
+            <AppText variant="captionBold" style={styles.stopTime}>
               {arrivalLabel}
-            </ThemedText>
-            <ThemedText type="small">{toName}</ThemedText>
-          </ThemedView>
-        </ThemedView>
-      </ThemedView>
-    </ThemedView>
+            </AppText>
+            <AppText variant="caption">{toName}</AppText>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 });
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: Spacing.three,
+    borderRadius: radius.md,
     overflow: "hidden",
-    marginBottom: Spacing.two,
+    marginBottom: space[8],
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
+    paddingHorizontal: space[24],
+    paddingVertical: space[8],
   },
   timeToDeparture: {
     flex: 1,
@@ -94,7 +109,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flexDirection: "row",
-    paddingVertical: Spacing.three,
+    paddingVertical: space[16],
   },
   busIconContainer: {
     width: 50,
@@ -104,14 +119,14 @@ const styles = StyleSheet.create({
   bodyContent: {
     flex: 1,
     flexDirection: "column",
-    gap: Spacing.one,
+    gap: space[4],
   },
   lineId: {
-    marginBottom: Spacing.one,
+    marginBottom: space[4],
   },
   stopContainer: {
     flexDirection: "row",
-    gap: Spacing.two,
+    gap: space[8],
   },
   stopTime: {
     width: 50,

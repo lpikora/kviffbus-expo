@@ -1,8 +1,8 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { ErrorMessage } from "@/components/error-message";
-import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/hooks/use-theme";
 import { ErrorCode } from "@/types/appError";
 
 type Props = {
@@ -12,6 +12,16 @@ type Props = {
 type State = {
   hasError: boolean;
 };
+
+function ErrorFallback() {
+  const theme = useTheme();
+
+  return (
+    <View style={[styles.fallback, { backgroundColor: theme.colors.bg }]}>
+      <ErrorMessage code={ErrorCode.Unknown} />
+    </View>
+  );
+}
 
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
@@ -26,11 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      return (
-        <ThemedView style={styles.fallback}>
-          <ErrorMessage code={ErrorCode.Unknown} />
-        </ThemedView>
-      );
+      return <ErrorFallback />;
     }
 
     return this.props.children;

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { ThemedText } from "@/components/themed-text";
+import { AppText } from "@/components/app-text";
 import { ErrorCode } from "@/types/appError";
 
 type ErrorMessageProps = {
@@ -11,7 +11,7 @@ type ErrorMessageProps = {
 export function ErrorMessage({ code }: ErrorMessageProps) {
   const { t } = useTranslation();
 
-  return <ThemedText style={styles.text}>{t(code)}</ThemedText>;
+  return <AppText style={styles.text}>{t(code)}</AppText>;
 }
 
 const styles = StyleSheet.create({

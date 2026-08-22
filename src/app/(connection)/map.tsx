@@ -1,27 +1,28 @@
 import { Image } from "expo-image";
-import { ScrollView, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
+import { ScrollView, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { AppText } from "@/components/app-text";
+import { MaxContentWidth, radius, space } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 
 export default function MapScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const mapImageUrl = useDataStore(
     (state) => state.appConfig?.busStopsMapImageUrl,
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="small" themeColor="textSecondary" style={styles.caption}>
+        <AppText variant="caption" tone="muted" style={styles.caption}>
           {t("selectStopFromMapScreen.comingSoon")}
-        </ThemedText>
+        </AppText>
         {mapImageUrl ? (
           <Image
             source={{ uri: mapImageUrl }}
@@ -31,7 +32,7 @@ export default function MapScreen() {
           />
         ) : null}
       </ScrollView>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -40,12 +41,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.four,
+    padding: space[24],
     alignItems: "center",
     alignSelf: "center",
     width: "100%",
     maxWidth: MaxContentWidth,
-    gap: Spacing.three,
+    gap: space[16],
   },
   caption: {
     textAlign: "center",
@@ -53,6 +54,6 @@ const styles = StyleSheet.create({
   mapImage: {
     width: "100%",
     aspectRatio: 3 / 4,
-    borderRadius: Spacing.three,
+    borderRadius: radius.md,
   },
 });
