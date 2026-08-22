@@ -76,7 +76,8 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "<rootDir>/src/services/__tests__/fixtures.ts"
+      "<rootDir>/src/services/__tests__/fixtures.ts",
+      "<rootDir>/src/stores/__tests__/memory-storage.ts"
     ]
   },
   "lint-staged": {

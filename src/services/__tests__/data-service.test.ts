@@ -1,6 +1,7 @@
 import { AppError } from "@/errors/appError";
 import {
   DEFAULT_DATA_URL,
+  getJsonModulePayload,
   getRemoteData,
   parseDataDto,
 } from "@/services/data-service";
@@ -118,5 +119,41 @@ describe("getRemoteData", () => {
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
+  });
+
+  test("throws DataLoadFailed when fetch rejects", async () => {
+    mockFetch(async () => {
+      throw new Error("network down");
+    });
+
+    await expect(getRemoteData()).rejects.toMatchObject({
+      name: "AppError",
+      code: ErrorCode.DataLoadFailed,
+    });
+  });
+
+  test("throws DataLoadFailed when the request is aborted", async () => {
+    mockFetch(async () => {
+      throw new DOMException("The operation was aborted.", "AbortError");
+    });
+
+    await expect(getRemoteData()).rejects.toMatchObject({
+      name: "AppError",
+      code: ErrorCode.DataLoadFailed,
+    });
+  });
+});
+
+describe("getJsonModulePayload", () => {
+  test("returns a raw JSON module unchanged", () => {
+    const payload = makeDataDto();
+
+    expect(getJsonModulePayload(payload)).toEqual(payload);
+  });
+
+  test("unwraps a default-exported JSON module", () => {
+    const payload = makeDataDto();
+
+    expect(getJsonModulePayload({ default: payload })).toEqual(payload);
   });
 });

@@ -43,7 +43,8 @@ function search(options: {
   stops?: typeof stops;
   fromStop?: typeof thermalStop | null;
   toStop?: typeof puppStop | null;
-  date: Date;
+  date?: Date;
+  departureType?: TypeOfDepartureDateTimeType;
 }) {
   return searchConnections(
     options.connectionsMap ??
@@ -55,8 +56,8 @@ function search(options: {
       fromStop: options.fromStop === undefined ? thermalStop : options.fromStop,
       toStop: options.toStop === undefined ? puppStop : options.toStop,
       departureDateTime: {
-        type: TypeOfDepartureDateTimeType.dateTime,
-        date: options.date,
+        type: options.departureType ?? TypeOfDepartureDateTimeType.dateTime,
+        date: options.date ?? null,
       },
     },
   );
@@ -66,6 +67,9 @@ describe("searchConnections", () => {
   test("throws MissingStops when a stop is missing", () => {
     expect(() =>
       search({ fromStop: null, date: new Date("2026-07-04T10:00:00") }),
+    ).toThrow(new AppError(ErrorCode.MissingStops));
+    expect(() =>
+      search({ toStop: null, date: new Date("2026-07-04T10:00:00") }),
     ).toThrow(new AppError(ErrorCode.MissingStops));
   });
 
@@ -329,5 +333,83 @@ describe("searchConnections", () => {
 
     expect(results).toHaveLength(1);
     expect(results[0].departureDate.getDate()).toBe(5);
+  });
+
+  test("uses the current time when departure type is now", () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-07-04T13:00:00"));
+
+    try {
+      const results = search({
+        departureType: TypeOfDepartureDateTimeType.now,
+        connections: [
+          makeConnection({
+            id: 1,
+            departureArrivalTimes: { timeDeparture: 720, timeArrival: 740 },
+          }),
+          makeConnection({
+            id: 2,
+            departureArrivalTimes: { timeDeparture: 840, timeArrival: 860 },
+          }),
+        ],
+      });
+
+      expect(results.map((connection) => connection.id)).toEqual([2, 1, 2]);
+      expect(results[0].departureDate.getDate()).toBe(4);
+      expect(results[1].departureDate.getDate()).toBe(5);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("returns an empty list for an unknown stop pair", () => {
+    const unknownTo = { ...puppStop, id: 99, name: "Unknown" };
+
+    expect(
+      search({
+        toStop: unknownTo,
+        stops: [...stops, unknownTo],
+        date: new Date("2026-07-04T10:00:00"),
+      }),
+    ).toEqual([]);
+  });
+
+  test("keeps only one connection per departure time", () => {
+    const results = search({
+      connections: [
+        makeConnection({
+          id: 1,
+          departureArrivalTimes: { timeDeparture: 720, timeArrival: 740 },
+        }),
+        makeConnection({
+          id: 2,
+          lineId: "F2",
+          departureArrivalTimes: { timeDeparture: 720, timeArrival: 750 },
+        }),
+      ],
+      date: new Date("2026-07-04T10:00:00"),
+    });
+
+    expect(results).toHaveLength(2);
+    expect(results.map((connection) => connection.id)).toEqual([1, 1]);
+  });
+
+  test("keeps a departure exactly at exception end time", () => {
+    const results = search({
+      exceptions: [
+        makeException({
+          id: thermalStop.id,
+          fromDate: "2026-07-04",
+          fromTime: 600,
+          toDate: "2026-07-04",
+          toTime: 720,
+        }),
+      ],
+      date: new Date("2026-07-04T10:00:00"),
+    });
+
+    expect(results.map((connection) => connection.departureDate.getDate())).toEqual(
+      [4, 5],
+    );
   });
 });

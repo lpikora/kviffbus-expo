@@ -14,6 +14,10 @@ describe("getDurationBetweenTwoTimes", () => {
   test("returns duration on the same day", () => {
     expect(getDurationBetweenTwoTimes(750, 775)).toBe("25 min");
   });
+
+  test("returns zero minutes when departure and arrival match", () => {
+    expect(getDurationBetweenTwoTimes(720, 720)).toBe("0 min");
+  });
 });
 
 describe("formatMinutesToHhMm", () => {
@@ -47,20 +51,22 @@ describe("getDateTimeStringFromNowToDate", () => {
   });
 
   test("uses a calendar string for another day", () => {
-    const label = getDateTimeStringFromNowToDate(
-      new Date(2026, 6, 5, 12, 0, 0),
-    );
-
-    expect(label).not.toContain("h");
-    expect(label.length).toBeGreaterThan(0);
+    expect(
+      getDateTimeStringFromNowToDate(new Date(2026, 6, 5, 12, 0, 0)),
+    ).toBe("Tomorrow at 12:00");
   });
 
   test("uses relative time for a same-day departure under an hour", () => {
-    const label = getDateTimeStringFromNowToDate(
-      new Date(2026, 6, 4, 10, 30, 0),
-    );
+    expect(
+      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 10, 30, 0)),
+    ).toBe("in 30 minutes");
+  });
 
-    expect(label).not.toMatch(/\d+ h \d+ min/);
-    expect(label.length).toBeGreaterThan(0);
+  test("uses Czech calendar copy when the language is cs", async () => {
+    await i18n.changeLanguage("cs");
+
+    expect(
+      getDateTimeStringFromNowToDate(new Date(2026, 6, 5, 12, 0, 0)),
+    ).toBe("Zítra v 12:00");
   });
 });

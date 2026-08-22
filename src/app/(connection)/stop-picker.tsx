@@ -9,22 +9,13 @@ import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 import { StopDto, TypeOfStopType } from "@/types/stopDto";
-
-function parseField(
-  value: string | string[] | undefined,
-): TypeOfStopType | undefined {
-  const field = Array.isArray(value) ? value[0] : value;
-  if (field === "from" || field === "to") {
-    return field;
-  }
-  return undefined;
-}
+import { parseStopField } from "@/utils/parse-stop-field";
 
 export default function StopPickerScreen() {
   const { field: fieldParam } = useLocalSearchParams<{
     field?: TypeOfStopType;
   }>();
-  const field = parseField(fieldParam);
+  const field = parseStopField(fieldParam);
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const theme = useTheme();

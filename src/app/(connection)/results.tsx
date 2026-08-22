@@ -13,24 +13,12 @@ import { AppText } from "@/components/app-text";
 import { ConnectionListItem } from "@/components/connection-list-item";
 import { ErrorMessage } from "@/components/error-message";
 import { useTheme } from "@/hooks/use-theme";
-import { ResultsQuery, useSearchStore } from "@/stores/search-store";
+import { useSearchStore } from "@/stores/search-store";
 import { ConnectionResult } from "@/types/connectionResult";
+import { resultsMatchQuery } from "@/utils/results-match-query";
 
 function keyExtractor(item: ConnectionResult) {
   return `${item.id}-${item.departureDate.toISOString()}`;
-}
-
-function resultsMatchQuery(
-  fromStopId: number | undefined,
-  toStopId: number | undefined,
-  resultsQuery: ResultsQuery | null,
-) {
-  return (
-    fromStopId != null &&
-    toStopId != null &&
-    resultsQuery?.fromStopId === fromStopId &&
-    resultsQuery?.toStopId === toStopId
-  );
 }
 
 export default function ResultsScreen() {

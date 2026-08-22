@@ -14,7 +14,7 @@ export function parseDataDto(data: unknown): DataDto {
   return result.data;
 }
 
-function getJsonModulePayload(module: unknown): unknown {
+export function getJsonModulePayload(module: unknown): unknown {
   if (
     typeof module === "object" &&
     module !== null &&
