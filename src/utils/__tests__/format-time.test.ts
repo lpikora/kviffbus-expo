@@ -50,6 +50,18 @@ describe("getDateTimeStringFromNowToDate", () => {
     ).toBe(`${i18n.t("time.in")} 2 h 5 min`);
   });
 
+  test("omits minutes when a same-day departure is an exact number of hours away", async () => {
+    expect(
+      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 11, 0, 0)),
+    ).toBe(`${i18n.t("time.in")} 1 h`);
+
+    await i18n.changeLanguage("cs");
+
+    expect(
+      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 11, 0, 0)),
+    ).toBe("za 1 h");
+  });
+
   test("uses a calendar string for another day", () => {
     expect(
       getDateTimeStringFromNowToDate(new Date(2026, 6, 5, 12, 0, 0)),

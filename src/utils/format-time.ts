@@ -35,6 +35,10 @@ export function getDateTimeStringFromNowToDate(date: Date) {
     return dayjs().to(date);
   }
 
+  if (m === 0) {
+    return `${i18n.t("time.in")} ${h} h`;
+  }
+
   return `${i18n.t("time.in")} ${h} h ${m} min`;
 }
 
