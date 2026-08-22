@@ -52,11 +52,15 @@ export default function ConnectionScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.searchButton,
+            { backgroundColor: theme.colors.accent },
             pressed && styles.pressed,
           ]}
           onPress={handleSearch}
         >
-          <AppText variant="bodyBold" style={styles.searchButtonText}>
+          <AppText
+            variant="bodyBold"
+            style={{ color: theme.colors.onAccent }}
+          >
             {t("SearchButton.search")}
           </AppText>
         </Pressable>
@@ -91,10 +95,6 @@ const styles = StyleSheet.create({
     marginTop: space[8],
     paddingVertical: space[16],
     borderRadius: radius.lg,
-    backgroundColor: "#007AFF",
     alignItems: "center",
-  },
-  searchButtonText: {
-    color: "#fff",
   },
 });

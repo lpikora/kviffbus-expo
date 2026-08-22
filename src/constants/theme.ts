@@ -11,7 +11,7 @@ export const palette = {
   grayMutedLight: "#60646C",
   gray2: "#F0F0F3",
   gray4: "#E0E1E6",
-  blue: "#2c70e0",
+  blue: "#007AFF",
 } as const;
 
 export const space = {
@@ -72,6 +72,7 @@ export const themes = {
       bgSubtle: palette.gray2,
       bgSelected: palette.gray4,
       accent: palette.blue,
+      onAccent: palette.white,
       border: palette.gray4,
     },
     ...shared,
@@ -85,6 +86,7 @@ export const themes = {
       bgSubtle: palette.navyElevated,
       bgSelected: palette.graySelectedDark,
       accent: palette.blue,
+      onAccent: palette.white,
       border: palette.grayBorderDark,
     },
     ...shared,
