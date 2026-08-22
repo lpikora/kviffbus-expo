@@ -63,4 +63,7 @@ export default {
     searchFailed: "Nastala chyba při hledání spojů.",
     unknown: "Něco se pokazilo.",
   } satisfies Record<ErrorTranslationKey, string>,
+  ErrorBoundary: {
+    retry: "Zkusit znovu",
+  },
 };

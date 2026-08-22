@@ -1,46 +1,36 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { type ErrorBoundaryProps } from "expo-router";
+import { useEffect } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
+import { AppText } from "@/components/app-text";
 import { ErrorMessage } from "@/components/error-message";
+import { space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { ErrorCode } from "@/types/appError";
 
-type Props = {
-  children: ReactNode;
-};
-
-type State = {
-  hasError: boolean;
-};
-
-function ErrorFallback() {
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    console.warn("ErrorBoundary", error);
+  }, [error]);
 
   return (
     <View style={[styles.fallback, { backgroundColor: theme.colors.bg }]}>
       <ErrorMessage code={ErrorCode.Unknown} />
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => {
+          void retry();
+        }}
+        style={({ pressed }) => [styles.retry, pressed && styles.pressed]}
+      >
+        <AppText tone="accent">{t("ErrorBoundary.retry")}</AppText>
+      </Pressable>
     </View>
   );
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
-
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.warn("ErrorBoundary", error, info.componentStack);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <ErrorFallback />;
-    }
-
-    return this.props.children;
-  }
 }
 
 const styles = StyleSheet.create({
@@ -48,5 +38,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    gap: space[16],
+    paddingHorizontal: space[24],
+  },
+  retry: {
+    paddingVertical: space[8],
+    paddingHorizontal: space[16],
+  },
+  pressed: {
+    opacity: 0.6,
   },
 });

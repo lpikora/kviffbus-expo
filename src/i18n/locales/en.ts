@@ -62,4 +62,7 @@ export default {
     dataLoadFailed: "Failed to load data.",
     unknown: "Something went wrong.",
   } satisfies Record<ErrorTranslationKey, string>,
+  ErrorBoundary: {
+    retry: "Try again",
+  },
 };
