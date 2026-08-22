@@ -2,13 +2,14 @@ import { AppError } from "@/errors/appError";
 import i18n from "@/i18n";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
-import { ConnectionDto } from "@/types/connectionDto";
+import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
 import {
   DepartureDateTimeType,
   TypeOfDepartureDateTimeType,
 } from "@/types/departureDateTimeType";
 import { StopDto } from "@/types/stopDto";
 import { StopExceptionDto } from "@/types/stopExceptionDto";
+import { connectionKey } from "@/utils/connection-key";
 import moment from "moment";
 
 export interface SearchParams {
@@ -19,7 +20,7 @@ export interface SearchParams {
 
 export class ConnectionService {
   static searchConnections(
-    connections: ConnectionDto[],
+    connections: ConnectionsMap,
     stops: StopDto[],
     exceptions: StopExceptionDto[],
     appConfig: AppConfigDto | null,
@@ -36,7 +37,7 @@ export class ConnectionService {
     if (stops.length === 0) {
       throw new AppError(ErrorCode.DataNotReady);
     }
-    if (connections.length === 0) {
+    if (Object.keys(connections).length === 0) {
       throw new AppError(ErrorCode.DataNotReady);
     }
 
@@ -45,27 +46,28 @@ export class ConnectionService {
         ? new Date()
         : (depTime.date ?? new Date());
 
-    const departureDayConnections = this.filterAndSortConnections(
-      fromStop.id,
-      toStop.id,
+    const group = connections[connectionKey(fromStop.id, toStop.id)] ?? [];
+
+    const departureDayConnections = this.filterAndAnnotateConnections(
+      group,
+      this.getMinutesFromDate(departureDateTime),
       departureDateTime,
-      connections,
       stops,
       appConfig,
     );
     const nextDayFromDepartureDateTime = this.getNextDayDate(departureDateTime);
-    const departureNextDayConnections = this.filterAndSortConnections(
-      fromStop.id,
-      toStop.id,
+    const departureNextDayConnections = this.filterAndAnnotateConnections(
+      group,
+      0,
       nextDayFromDepartureDateTime,
-      connections,
       stops,
       appConfig,
     );
-    const allConections = departureDayConnections.concat(
-      departureNextDayConnections,
+
+    return this.filterToStopExceptions(
+      departureDayConnections.concat(departureNextDayConnections),
+      exceptions,
     );
-    return this.filterToStopExceptions(allConections, exceptions);
   }
 
   private static hasStopException(
@@ -94,15 +96,14 @@ export class ConnectionService {
     exceptions: StopExceptionDto[],
   ): ConnectionDto[] {
     return connections.filter((connection) => {
-      const timeArrival =
-        connection.departureArrivalTimes.timeArrival.split(":");
-      const arrivalDateTime = new Date(connection.departureDate!);
-      arrivalDateTime.setHours(+timeArrival[0], +timeArrival[1]);
-
-      const timeDeparture =
-        connection.departureArrivalTimes.timeDeparture.split(":");
-      const departureDateTime = new Date(connection.departureDate!);
-      departureDateTime.setHours(+timeDeparture[0], +timeDeparture[1]);
+      const arrivalDateTime = this.dateWithMinutes(
+        connection.departureDate!,
+        connection.departureArrivalTimes.timeArrival,
+      );
+      const departureDateTime = this.dateWithMinutes(
+        connection.departureDate!,
+        connection.departureArrivalTimes.timeDeparture,
+      );
 
       if (
         this.hasStopException(
@@ -128,99 +129,70 @@ export class ConnectionService {
     });
   }
 
-  private static filterAndSortConnections(
-    fromStop: number,
-    toStop: number,
+  private static filterAndAnnotateConnections(
+    group: ConnectionDto[],
+    minDepartureMinutes: number,
     departureDateTime: Date,
-    connections: ConnectionDto[],
     stops: StopDto[],
     appConfig?: AppConfigDto | null,
   ) {
-    const departureTime = this.getTimeStringFromDate(departureDateTime);
     const departureDate = this.getDateStringFromDate(departureDateTime);
+    const fromIndex = this.lowerBound(group, minDepartureMinutes);
 
-    const filteredConnections = connections.filter(
-      (connection: ConnectionDto) => {
-        if (
-          connection.from === fromStop &&
-          connection.to === toStop &&
-          !connection.notGoesOn.includes(departureDate)
-        ) {
-          if (connection.goesOnlyOn.length) {
-            if (connection.goesOnlyOn.includes(departureDate)) {
-              return true;
-            } else {
-              return false;
-            }
-          }
-          return true;
-        }
-        return false;
-      },
-    );
+    const filteredConnections = [];
+    for (let index = fromIndex; index < group.length; index++) {
+      const connection = group[index];
+      if (connection.notGoesOn.includes(departureDate)) {
+        continue;
+      }
+      if (
+        connection.goesOnlyOn.length &&
+        !connection.goesOnlyOn.includes(departureDate)
+      ) {
+        continue;
+      }
+      filteredConnections.push(connection);
+    }
 
-    const sortedfilteredConnections =
-      this.sortConnectionTimes(filteredConnections);
-
-    // filter duplicite when bus going back and througt same stops
-    const nonDuplicitConnections = sortedfilteredConnections.filter(
+    const nonDuplicitConnections = filteredConnections.filter(
       (connection, index, array) =>
         !array[index - 1] ||
         connection.departureArrivalTimes.timeDeparture !==
           array[index - 1].departureArrivalTimes.timeDeparture,
     );
 
-    const nonPastConnections = this.filterPastConnections(
-      nonDuplicitConnections,
-      departureTime,
-    );
-
-    const nonDuplicitConnectionsWithStopNames =
+    const connectionsWithStopNames =
       this.setStopNamesAndDepartureDateToConnections(
-        nonPastConnections,
+        nonDuplicitConnections,
         departureDateTime,
         stops,
       );
 
-    const connectionNonAfterOperationsEnd =
-      this.filterConnectionAfterOperationsEndDate(
-        nonDuplicitConnectionsWithStopNames,
-        departureDate,
-        appConfig,
-      );
-
-    return connectionNonAfterOperationsEnd;
+    return this.filterConnectionAfterOperationsEndDate(
+      connectionsWithStopNames,
+      departureDate,
+      appConfig,
+    );
   }
 
-  private static sortConnectionTimes(connections: ConnectionDto[]) {
-    return [...connections].sort((a: ConnectionDto, b: ConnectionDto) => {
-      const aParts = this.getTimeNumericParts(
-        a.departureArrivalTimes.timeDeparture,
-      );
-      const bParts = this.getTimeNumericParts(
-        b.departureArrivalTimes.timeDeparture,
-      );
-
-      // Sorts by hour then minute
-      return aParts[0] - bParts[0] || aParts[1] - bParts[1];
-    });
-  }
-
-  private static filterPastConnections(
+  private static lowerBound(
     connections: ConnectionDto[],
-    departureTimeString: string,
+    minDepartureMinutes: number,
   ) {
-    return connections.filter((connection: ConnectionDto) => {
-      const connectionDeparture = this.getTimeNumericParts(
-        connection.departureArrivalTimes.timeDeparture,
-      );
-      const desiredDeparture = this.getTimeNumericParts(departureTimeString);
-      return (
-        connectionDeparture[0] > desiredDeparture[0] ||
-        (connectionDeparture[0] === desiredDeparture[0] &&
-          connectionDeparture[1] >= desiredDeparture[1])
-      );
-    });
+    let lo = 0;
+    let hi = connections.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (
+        connections[mid].departureArrivalTimes.timeDeparture <
+        minDepartureMinutes
+      ) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
   }
 
   private static filterConnectionAfterOperationsEndDate(
@@ -240,17 +212,8 @@ export class ConnectionService {
     }
   }
 
-  private static getTimeStringFromDate(date: Date) {
-    let hour = date.getHours().toString();
-    let minute = date.getMinutes().toString();
-    if (hour.length === 1) {
-      hour = "0" + hour;
-    }
-    if (minute.length === 1) {
-      minute = "0" + minute;
-    }
-
-    return hour + ":" + minute;
+  private static getMinutesFromDate(date: Date) {
+    return date.getHours() * 60 + date.getMinutes();
   }
 
   private static getDateStringFromDate(date: Date) {
@@ -274,6 +237,15 @@ export class ConnectionService {
     return stopsObject;
   }
 
+  private static dateWithMinutes(baseDate: Date, minutesFromMidnight: number) {
+    const date = new Date(baseDate);
+    date.setHours(
+      Math.floor(minutesFromMidnight / 60),
+      minutesFromMidnight % 60,
+    );
+    return date;
+  }
+
   private static setStopNamesAndDepartureDateToConnections(
     connections: ConnectionDto[],
     desiredDepartureDate: Date,
@@ -281,18 +253,15 @@ export class ConnectionService {
   ) {
     const stopsObject = this.stopsArrayToObject(stops);
     return connections.map((connection) => {
-      const timeHoursMinutes = this.getTimeNumericParts(
-        connection.departureArrivalTimes.timeDeparture,
-      );
-      const connectionDepartureDate = new Date(desiredDepartureDate);
-      connectionDepartureDate.setHours(timeHoursMinutes[0]);
-      connectionDepartureDate.setMinutes(timeHoursMinutes[1]);
       return {
         ...connection,
         departureArrivalTimes: { ...connection.departureArrivalTimes },
         fromName: stopsObject[connection.from].name,
         toName: stopsObject[connection.to].name,
-        departureDate: connectionDepartureDate,
+        departureDate: this.dateWithMinutes(
+          desiredDepartureDate,
+          connection.departureArrivalTimes.timeDeparture,
+        ),
       };
     });
   }
@@ -306,8 +275,10 @@ export class ConnectionService {
     return tomorrow;
   }
 
-  private static getTimeNumericParts(time: string) {
-    return time.split(":").map((x) => +x);
+  public static formatMinutesToHhMm(minutes: number) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
   }
 
   public static getDateTimeStringFromNowToDate(date: Date) {
@@ -343,16 +314,14 @@ export class ConnectionService {
   }
 
   public static getDurationBetweenTwoTimes(
-    departureTime: string,
-    arrivalTime: string,
+    departureMinutes: number,
+    arrivalMinutes: number,
   ) {
-    const departure = moment(departureTime, "HH:mm");
-    const arrival = moment(arrivalTime, "HH:mm");
-
-    if (arrival < departure) {
-      arrival.add(1, "days");
+    let duration = arrivalMinutes - departureMinutes;
+    if (duration < 0) {
+      duration += 1440;
     }
 
-    return moment.duration(arrival.diff(departure)).asMinutes() + " min";
+    return duration + " min";
   }
 }

@@ -1,7 +1,9 @@
 import { AppError } from "@/errors/appError";
 import { ConnectionService } from "@/services/connectionService";
 import { ErrorCode } from "@/types/appError";
+import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
 import { TypeOfDepartureDateTimeType } from "@/types/departureDateTimeType";
+import { connectionKey } from "@/utils/connection-key";
 
 import {
   makeAppConfig,
@@ -12,8 +14,30 @@ import {
   thermalStop,
 } from "./fixtures";
 
+function toConnectionsMap(connections: ConnectionDto[]): ConnectionsMap {
+  const map: ConnectionsMap = {};
+  for (const connection of connections) {
+    const key = connectionKey(connection.from, connection.to);
+    if (!map[key]) {
+      map[key] = [];
+    }
+    map[key].push(connection);
+  }
+
+  for (const key of Object.keys(map)) {
+    map[key] = [...map[key]].sort(
+      (a, b) =>
+        a.departureArrivalTimes.timeDeparture -
+        b.departureArrivalTimes.timeDeparture,
+    );
+  }
+
+  return map;
+}
+
 function search(options: {
-  connections?: ReturnType<typeof makeConnection>[];
+  connections?: ConnectionDto[];
+  connectionsMap?: ConnectionsMap;
   exceptions?: ReturnType<typeof makeException>[];
   appConfig?: ReturnType<typeof makeAppConfig> | null;
   stops?: typeof stops;
@@ -22,7 +46,8 @@ function search(options: {
   date: Date;
 }) {
   return ConnectionService.searchConnections(
-    options.connections ?? [makeConnection()],
+    options.connectionsMap ??
+      toConnectionsMap(options.connections ?? [makeConnection()]),
     options.stops ?? stops,
     options.exceptions ?? [],
     options.appConfig === undefined ? makeAppConfig() : options.appConfig,
@@ -56,9 +81,12 @@ describe("ConnectionService.searchConnections", () => {
     ).toThrow(new AppError(ErrorCode.DataNotReady));
   });
 
-  test("throws DataNotReady when connections are empty", () => {
+  test("throws DataNotReady when connections map is empty", () => {
     expect(() =>
-      search({ connections: [], date: new Date("2026-07-04T10:00:00") }),
+      search({
+        connectionsMap: {},
+        date: new Date("2026-07-04T10:00:00"),
+      }),
     ).toThrow(new AppError(ErrorCode.DataNotReady));
   });
 
@@ -136,15 +164,15 @@ describe("ConnectionService.searchConnections", () => {
         makeConnection({
           id: 1,
           departureArrivalTimes: {
-            timeDeparture: "08:00",
-            timeArrival: "08:20",
+            timeDeparture: 480,
+            timeArrival: 500,
           },
         }),
         makeConnection({
           id: 2,
           departureArrivalTimes: {
-            timeDeparture: "22:30",
-            timeArrival: "22:50",
+            timeDeparture: 1350,
+            timeArrival: 1370,
           },
         }),
       ],
@@ -182,30 +210,36 @@ describe("ConnectionService.searchConnections", () => {
     ).toHaveLength(1);
   });
 
-  test("does not mutate the input connections array when sorting", () => {
-    const connections = [
-      makeConnection({
-        id: 2,
-        departureArrivalTimes: {
-          timeDeparture: "14:00",
-          timeArrival: "14:20",
-        },
-      }),
-      makeConnection({
-        id: 1,
-        departureArrivalTimes: {
-          timeDeparture: "12:00",
-          timeArrival: "12:20",
-        },
-      }),
-    ];
+  test("does not mutate the input connections when searching", () => {
+    const late = makeConnection({
+      id: 2,
+      departureArrivalTimes: {
+        timeDeparture: 840,
+        timeArrival: 860,
+      },
+    });
+    const early = makeConnection({
+      id: 1,
+      departureArrivalTimes: {
+        timeDeparture: 720,
+        timeArrival: 740,
+      },
+    });
+    const connectionsMap = toConnectionsMap([late, early]);
+    const originalOrder = connectionsMap[
+      connectionKey(thermalStop.id, puppStop.id)
+    ].map((connection) => connection.id);
 
     const results = search({
-      connections,
+      connectionsMap,
       date: new Date("2026-07-04T10:00:00"),
     });
 
-    expect(connections.map((connection) => connection.id)).toEqual([2, 1]);
+    expect(
+      connectionsMap[connectionKey(thermalStop.id, puppStop.id)].map(
+        (connection) => connection.id,
+      ),
+    ).toEqual(originalOrder);
     expect(results.map((connection) => connection.id)).toEqual([1, 2, 1, 2]);
   });
 
@@ -230,14 +264,21 @@ describe("ConnectionService.searchConnections", () => {
 
 describe("ConnectionService.getDurationBetweenTwoTimes", () => {
   test("returns duration across midnight", () => {
-    expect(ConnectionService.getDurationBetweenTwoTimes("23:50", "00:10")).toBe(
+    expect(ConnectionService.getDurationBetweenTwoTimes(1430, 10)).toBe(
       "20 min",
     );
   });
 
   test("returns duration on the same day", () => {
-    expect(ConnectionService.getDurationBetweenTwoTimes("12:30", "12:55")).toBe(
+    expect(ConnectionService.getDurationBetweenTwoTimes(750, 775)).toBe(
       "25 min",
     );
+  });
+});
+
+describe("ConnectionService.formatMinutesToHhMm", () => {
+  test("formats minutes from midnight", () => {
+    expect(ConnectionService.formatMinutesToHhMm(720)).toBe("12:00");
+    expect(ConnectionService.formatMinutesToHhMm(5)).toBe("00:05");
   });
 });

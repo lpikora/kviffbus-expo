@@ -13,8 +13,8 @@ const connectionSchema = z.object({
   from: z.number(),
   to: z.number(),
   departureArrivalTimes: z.object({
-    timeDeparture: z.string(),
-    timeArrival: z.string(),
+    timeDeparture: z.number(),
+    timeArrival: z.number(),
   }),
   busNumber: z.string(),
   goesOnlyOn: z.array(z.string()),
@@ -48,7 +48,7 @@ const appConfigSchema = z.object({
 
 export const dataDtoSchema = z.object({
   stops: z.array(stopSchema),
-  connections: z.array(connectionSchema),
+  connections: z.record(z.string(), z.array(connectionSchema)),
   stopExceptions: z.array(stopExceptionSchema),
   appConfig: appConfigSchema,
 });

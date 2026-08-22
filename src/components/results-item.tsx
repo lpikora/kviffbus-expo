@@ -8,8 +8,8 @@ import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
 
 interface Props {
-  timeDeparture: string;
-  timeArrival: string;
+  timeDeparture: number;
+  timeArrival: number;
   lineId: string;
   fromName: string;
   toName: string;
@@ -30,6 +30,8 @@ export const ResultsListItem = memo(function ResultsListItem({
     timeDeparture,
     timeArrival,
   );
+  const departureLabel = ConnectionService.formatMinutesToHhMm(timeDeparture);
+  const arrivalLabel = ConnectionService.formatMinutesToHhMm(timeArrival);
 
   return (
     <ThemedView style={styles.container}>
@@ -55,13 +57,13 @@ export const ResultsListItem = memo(function ResultsListItem({
           </ThemedText>
           <ThemedView style={styles.stopContainer}>
             <ThemedText type="smallBold" style={styles.stopTime}>
-              {timeDeparture}
+              {departureLabel}
             </ThemedText>
             <ThemedText type="small">{fromName}</ThemedText>
           </ThemedView>
           <ThemedView style={styles.stopContainer}>
             <ThemedText type="smallBold" style={styles.stopTime}>
-              {timeArrival}
+              {arrivalLabel}
             </ThemedText>
             <ThemedText type="small">{toName}</ThemedText>
           </ThemedView>

@@ -3,6 +3,7 @@ import { ConnectionDto } from "@/types/connectionDto";
 import { DataDto } from "@/types/dataDto";
 import { StopDto } from "@/types/stopDto";
 import { StopExceptionDto } from "@/types/stopExceptionDto";
+import { connectionKey } from "@/utils/connection-key";
 
 export const thermalStop: StopDto = {
   id: 1,
@@ -51,8 +52,8 @@ export function makeConnection(
     from: thermalStop.id,
     to: puppStop.id,
     departureArrivalTimes: {
-      timeDeparture: "12:00",
-      timeArrival: "12:20",
+      timeDeparture: 720,
+      timeArrival: 740,
     },
     busNumber: "1",
     goesOnlyOn: [],
@@ -75,9 +76,12 @@ export function makeException(
 }
 
 export function makeDataDto(overrides: Partial<DataDto> = {}): DataDto {
+  const connection = makeConnection();
   return {
     stops,
-    connections: [makeConnection()],
+    connections: {
+      [connectionKey(connection.from, connection.to)]: [connection],
+    },
     stopExceptions: [],
     appConfig: makeAppConfig(),
     ...overrides,

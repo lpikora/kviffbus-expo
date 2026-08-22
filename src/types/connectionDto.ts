@@ -6,8 +6,10 @@ export interface ConnectionDto {
   to: number;
   toName?: string;
   departureDate?: Date;
-  departureArrivalTimes: { timeDeparture: string; timeArrival: string };
+  departureArrivalTimes: { timeDeparture: number; timeArrival: number };
   busNumber: string;
   goesOnlyOn: string[];
   notGoesOn: string[];
 }
+
+export type ConnectionsMap = Record<string, ConnectionDto[]>;

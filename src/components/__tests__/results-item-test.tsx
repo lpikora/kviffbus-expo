@@ -20,8 +20,8 @@ describe("<ResultsListItem />", () => {
   test("renders connection details", async () => {
     const { getByText } = await render(
       <ResultsListItem
-        timeDeparture="12:30"
-        timeArrival="12:55"
+        timeDeparture={750}
+        timeArrival={775}
         lineId="A1"
         fromName="Thermal"
         toName="Hotel Thermal"

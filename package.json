@@ -59,6 +59,7 @@
     "test:ci": "jest --watchAll=false --coverage=false",
     "test:related": "jest --bail --findRelatedTests --passWithNoTests --coverage=false",
     "type-check": "tsc --noEmit",
+    "transform-connections": "node scripts/transform-connections.mjs",
     "prepare": "husky"
   },
   "jest": {

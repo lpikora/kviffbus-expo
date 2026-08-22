@@ -5,7 +5,7 @@ import { clientStorage } from "@/services/storage";
 import { isNewerImportVersion } from "@/utils/import-version";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
-import { ConnectionDto } from "@/types/connectionDto";
+import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
 import {
   DepartureDateTimeType,
   TypeOfDepartureDateTimeType,
@@ -27,7 +27,7 @@ export interface StopsStoreState {
   fromStop: StopDto | null;
   toStop: StopDto | null;
   stops: StopDto[];
-  connections: ConnectionDto[];
+  connections: ConnectionsMap;
   stopExceptions: StopExceptionDto[];
   departureDateTime: DepartureDateTimeType;
   results: ConnectionDto[];
@@ -40,7 +40,7 @@ export interface StopsStoreActions {
   setFromStop: (stop: StopDto | null) => void;
   setToStop: (stop: StopDto | null) => void;
   setStops: (stops: StopDto[]) => void;
-  setConnections: (connections: ConnectionDto[]) => void;
+  setConnections: (connections: ConnectionsMap) => void;
   setStopExceptions: (stopExceptions: StopExceptionDto[]) => void;
   setDepartureDateTime: (
     departureDateTime: Partial<DepartureDateTimeType>,
@@ -59,7 +59,7 @@ export const stopsStoreDefaultValues: StopsStoreState = {
   fromStop: null,
   toStop: null,
   stops: [],
-  connections: [],
+  connections: {},
   stopExceptions: [],
   departureDateTime: {
     type: TypeOfDepartureDateTimeType.now,
@@ -130,7 +130,7 @@ export const useRootStore = create<StopsStore>()(
           const localData = await DataService.getLocalData();
           const { connections, appConfig } = get();
           const persistedIsCurrent =
-            connections.length > 0 &&
+            Object.keys(connections).length > 0 &&
             appConfig !== null &&
             !isNewerImportVersion(
               localData.appConfig.importVersion,
