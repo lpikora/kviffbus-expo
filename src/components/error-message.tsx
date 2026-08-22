@@ -1,4 +1,3 @@
-import { StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { AppText } from "@/components/app-text";
@@ -11,11 +10,5 @@ type ErrorMessageProps = {
 export function ErrorMessage({ code }: ErrorMessageProps) {
   const { t } = useTranslation();
 
-  return <AppText style={styles.text}>{t(code)}</AppText>;
+  return <AppText>{t(code)}</AppText>;
 }
-
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 15,
-  },
-});

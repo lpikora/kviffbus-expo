@@ -99,9 +99,7 @@ export default function ResultsScreen() {
 
   return (
     <View style={[styles.noConnectionsContainer, screenBg]}>
-      <AppText style={styles.noConnectionsText}>
-        {t("results.noResults")}
-      </AppText>
+      <AppText>{t("results.noResults")}</AppText>
     </View>
   );
 }
@@ -117,8 +115,5 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 30,
     alignItems: "center",
-  },
-  noConnectionsText: {
-    fontSize: 15,
   },
 });
