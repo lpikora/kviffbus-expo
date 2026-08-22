@@ -10,7 +10,6 @@ const resources = {
   en: { translation: en },
 };
 
-// TODO for android detect language change
 const deviceLanguage = Localization.getLocales()[0]?.languageCode ?? "en";
 
 i18n.use(initReactI18next).init({
