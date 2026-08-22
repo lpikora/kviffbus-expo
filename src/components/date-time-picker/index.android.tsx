@@ -1,5 +1,4 @@
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useCallback } from "react";
 
 import { DateTimePickerTrigger } from "./date-time-picker-trigger";
 import type { DateTimePickerProps } from "./types";
@@ -16,7 +15,7 @@ export function DateTimePicker({
   const { t, displayText, setDepartureNow, setDepartureDateTime } =
     useDepartureDateTimePicker(value, onChange);
 
-  const openPicker = useCallback(() => {
+  const openPicker = () => {
     const currentDate = value.date ?? new Date();
 
     DateTimePickerAndroid.open({
@@ -48,20 +47,9 @@ export function DateTimePicker({
         });
       },
     });
-  }, [
-    value.date,
-    minimumDate,
-    maximumDate,
-    t,
-    setDepartureNow,
-    setDepartureDateTime,
-  ]);
+  };
 
   return (
-    <DateTimePickerTrigger
-      label={t("selectTime.pickerTitle")}
-      value={displayText}
-      onPress={openPicker}
-    />
+    <DateTimePickerTrigger value={displayText} onPress={openPicker} />
   );
 }

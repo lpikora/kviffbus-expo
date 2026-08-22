@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -44,7 +43,7 @@ export default function StopPickerScreen() {
   const setFromStop = useSearchStore((state) => state.setFromStop);
   const setToStop = useSearchStore((state) => state.setToStop);
 
-  const handleSelect = useCallback(
+  const handleSelect = 
     (stop: StopDto) => {
       if (field === "from") {
         setFromStop(stop);
@@ -52,9 +51,7 @@ export default function StopPickerScreen() {
         setToStop(stop);
       }
       router.back();
-    },
-    [field, setFromStop, setToStop],
-  );
+    }
 
   return (
     <ScrollView

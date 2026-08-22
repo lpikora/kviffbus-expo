@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -21,16 +20,14 @@ export function useDepartureDateTimePicker(
         ? `${t("selectTime.departureOn")} ${formatDepartureDate(value.date, i18n.language)}`
         : t("selectTime.pickerTitle");
 
-  const setDepartureNow = useCallback(() => {
+  const setDepartureNow = () => {
     onChange({ type: TypeOfDepartureDateTimeType.now, date: null });
-  }, [onChange]);
+  };
 
-  const setDepartureDateTime = useCallback(
+  const setDepartureDateTime = 
     (date: Date) => {
       onChange({ type: TypeOfDepartureDateTimeType.dateTime, date });
-    },
-    [onChange],
-  );
+    };
 
   return {
     t,

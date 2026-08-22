@@ -1,5 +1,5 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Alert, Modal, useColorScheme, View } from "react-native";
 
 import { useTheme } from "@/hooks/use-theme";
@@ -26,18 +26,18 @@ export function DateTimePicker({
   const { t, displayText, setDepartureNow, setDepartureDateTime } =
     useDepartureDateTimePicker(value, onChange);
 
-  const openPickerModal = useCallback(() => {
+  const openPickerModal = () => {
     setPickerDate(value.date ?? new Date());
     setShowPicker(true);
-  }, [value.date]);
+  };
 
-  const openPicker = useCallback(() => {
+  const openPicker = () => {
     Alert.alert(t("selectTime.pickerTitle"), undefined, [
       { text: t("selectTime.departureNow"), onPress: setDepartureNow },
       { text: t("selectTime.departureOn"), onPress: openPickerModal },
       { text: t("selectTime.cancel"), style: "cancel" },
     ]);
-  }, [t, setDepartureNow, openPickerModal]);
+  };
 
   const confirmPicker = () => {
     setDepartureDateTime(pickerDate);
