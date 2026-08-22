@@ -1,8 +1,13 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { SplashScreen } from "expo-router";
+import { AppState, type AppStateStatus, type NativeEventSubscription } from "react-native";
 
 import { AppError } from "@/errors/appError";
-import { SPLASH_HIDE_TIMEOUT_MS, useInitData } from "@/hooks/use-sync-data";
+import {
+  SPLASH_HIDE_TIMEOUT_MS,
+  SYNC_INTERVAL_MS,
+  useInitData,
+} from "@/hooks/use-sync-data";
 import { makeAppConfig, makeDataDto } from "@/services/__tests__/fixtures";
 import { getLocalData, getRemoteData } from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
@@ -38,13 +43,33 @@ const bundled = makeDataDto({
   appConfig: makeAppConfig({ importVersion: "2026.2" }),
 });
 
+const appStateListeners: ((state: AppStateStatus) => void)[] = [];
+
+function emitAppState(state: AppStateStatus) {
+  for (const listener of appStateListeners) {
+    listener(state);
+  }
+}
+
 describe("useInitData", () => {
   beforeEach(async () => {
     memoryStorage.store.clear();
     hideSplash.mockClear();
+    appStateListeners.length = 0;
     getLocalDataMock.mockReset().mockResolvedValue(bundled);
     getRemoteDataMock.mockReset().mockResolvedValue(bundled);
     jest.spyOn(console, "warn").mockImplementation(() => {});
+    jest.spyOn(AppState, "addEventListener").mockImplementation((_event, handler) => {
+      appStateListeners.push(handler);
+      return {
+        remove: () => {
+          const index = appStateListeners.indexOf(handler);
+          if (index >= 0) {
+            appStateListeners.splice(index, 1);
+          }
+        },
+      } as NativeEventSubscription;
+    });
     useDataStore.getState().reset();
     useSearchStore.getState().reset();
     await useDataStore.persist.rehydrate();
@@ -152,6 +177,43 @@ describe("useInitData", () => {
     });
     await waitFor(() => {
       expect(getRemoteDataMock).toHaveBeenCalled();
+    });
+  });
+
+  test("does not sync again on resume before the interval elapses", async () => {
+    await renderHook(() => useInitData());
+
+    await waitFor(() => {
+      expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      emitAppState("background");
+      emitAppState("active");
+    });
+
+    expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("syncs again on resume after the interval elapses", async () => {
+    const startedAt = Date.now();
+    jest.spyOn(Date, "now").mockImplementation(() => startedAt);
+
+    await renderHook(() => useInitData());
+
+    await waitFor(() => {
+      expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+    });
+
+    jest.spyOn(Date, "now").mockImplementation(() => startedAt + SYNC_INTERVAL_MS);
+
+    await act(async () => {
+      emitAppState("background");
+      emitAppState("active");
+    });
+
+    await waitFor(() => {
+      expect(getRemoteDataMock).toHaveBeenCalledTimes(2);
     });
   });
 });

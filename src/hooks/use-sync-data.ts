@@ -1,11 +1,13 @@
 import { SplashScreen } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { AppState, type AppStateStatus } from "react-native";
 
 import { toErrorCode } from "@/errors/appError";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 
 export const SPLASH_HIDE_TIMEOUT_MS = 4_000;
+export const SYNC_INTERVAL_MS = 15 * 60 * 1000;
 
 function whenHydrated(persist: {
   hasHydrated: () => boolean;
@@ -23,6 +25,26 @@ export const useInitData = () => {
   const [isReady, setIsReady] = useState(false);
   const initData = useDataStore((state) => state.initData);
   const syncWithApi = useDataStore((state) => state.syncWithApi);
+  const lastSyncAttemptAtRef = useRef(0);
+  const syncInFlightRef = useRef(false);
+
+  const requestSync = () => {
+    if (syncInFlightRef.current) {
+      return;
+    }
+    if (
+      lastSyncAttemptAtRef.current !== 0 &&
+      Date.now() - lastSyncAttemptAtRef.current < SYNC_INTERVAL_MS
+    ) {
+      return;
+    }
+
+    lastSyncAttemptAtRef.current = Date.now();
+    syncInFlightRef.current = true;
+    void syncWithApi().finally(() => {
+      syncInFlightRef.current = false;
+    });
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -71,6 +93,24 @@ export const useInitData = () => {
     }
 
     SplashScreen.hide();
-    void syncWithApi();
-  }, [isReady, syncWithApi]);
+    requestSync();
+  }, [isReady, requestSync]);
+
+  useEffect(() => {
+    if (!isReady) {
+      return;
+    }
+
+    const onAppStateChange = (state: AppStateStatus) => {
+      if (state === "active") {
+        requestSync();
+      }
+    };
+
+    const subscription = AppState.addEventListener("change", onAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isReady, requestSync]);
 };

@@ -64,10 +64,13 @@ export const useDataStore = create<DataStore>()(
             appConfig: remoteData.appConfig,
           });
         } catch (error) {
-          console.warn(
-            "API offline / chyba. Ponechána data z data.json",
-            error,
-          );
+          // Ignore sync failures in production — festival venues often have spotty connectivity
+          if (__DEV__) {
+            console.warn(
+              "API offline / chyba. Ponechána data z data.json",
+              error,
+            );
+          }
         }
       },
       initData: async () => {
