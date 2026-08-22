@@ -1,5 +1,4 @@
 import { AppError } from "@/errors/appError";
-import i18n from "@/i18n";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
 import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
@@ -11,7 +10,7 @@ import {
 import { StopDto } from "@/types/stopDto";
 import { StopExceptionDto } from "@/types/stopExceptionDto";
 import { connectionKey } from "@/utils/connection-key";
-import moment from "moment";
+import { toDateKey } from "@/utils/format-time";
 
 export interface SearchParams {
   fromStop: StopDto | null;
@@ -71,24 +70,38 @@ export class ConnectionService {
     );
   }
 
-  private static hasStopException(
-    exceptions: StopExceptionDto[],
-    stopId: number,
-    departureDate: Date,
-  ) {
+  private static exceptionsByStopId(exceptions: StopExceptionDto[]) {
+    const byStopId = new Map<number, StopExceptionDto[]>();
     for (const exception of exceptions) {
-      if (exception.id === stopId) {
-        const fromDate = this.dateWithMinutes(
-          new Date(exception.fromDate),
-          exception.fromTime,
-        );
-        const toDate = this.dateWithMinutes(
-          new Date(exception.toDate),
-          exception.toTime,
-        );
-        if (departureDate > fromDate && departureDate < toDate) {
-          return true;
-        }
+      const list = byStopId.get(exception.id);
+      if (list) {
+        list.push(exception);
+      } else {
+        byStopId.set(exception.id, [exception]);
+      }
+    }
+    return byStopId;
+  }
+
+  private static hasStopException(
+    exceptions: StopExceptionDto[] | undefined,
+    atDate: Date,
+  ) {
+    if (!exceptions) {
+      return false;
+    }
+
+    for (const exception of exceptions) {
+      const fromDate = this.dateWithMinutes(
+        this.dateFromKey(exception.fromDate),
+        exception.fromTime,
+      );
+      const toDate = this.dateWithMinutes(
+        this.dateFromKey(exception.toDate),
+        exception.toTime,
+      );
+      if (atDate >= fromDate && atDate < toDate) {
+        return true;
       }
     }
     return false;
@@ -100,21 +113,34 @@ export class ConnectionService {
     fromStopId: number,
     toStopId: number,
   ): ConnectionResult[] {
+    const exceptionsByStopId = this.exceptionsByStopId(exceptions);
+
     return connections.filter((connection) => {
-      const arrivalDateTime = this.dateWithMinutes(
-        connection.departureDate,
-        connection.departureArrivalTimes.timeArrival,
-      );
+      const { timeDeparture, timeArrival } = connection.departureArrivalTimes;
       const departureDateTime = this.dateWithMinutes(
         connection.departureDate,
-        connection.departureArrivalTimes.timeDeparture,
+        timeDeparture,
       );
+      const arrivalDateTime = this.dateWithMinutes(
+        connection.departureDate,
+        timeArrival,
+      );
+      if (timeArrival < timeDeparture) {
+        arrivalDateTime.setDate(arrivalDateTime.getDate() + 1);
+      }
 
-      if (this.hasStopException(exceptions, toStopId, arrivalDateTime)) {
+      if (
+        this.hasStopException(exceptionsByStopId.get(toStopId), arrivalDateTime)
+      ) {
         return false;
       }
 
-      if (this.hasStopException(exceptions, fromStopId, departureDateTime)) {
+      if (
+        this.hasStopException(
+          exceptionsByStopId.get(fromStopId),
+          departureDateTime,
+        )
+      ) {
         return false;
       }
 
@@ -126,9 +152,9 @@ export class ConnectionService {
     group: ConnectionDto[],
     minDepartureMinutes: number,
     departureDateTime: Date,
-    appConfig?: AppConfigDto | null,
+    appConfig: AppConfigDto,
   ): ConnectionResult[] {
-    const dateKey = this.toDateKey(departureDateTime);
+    const dateKey = toDateKey(departureDateTime);
     const fromIndex = this.lowerBound(group, minDepartureMinutes);
 
     const matching: ConnectionDto[] = [];
@@ -153,7 +179,7 @@ export class ConnectionService {
           array[index - 1].departureArrivalTimes.timeDeparture,
     );
 
-    return this.excludeAfterOperationsEnd(
+    return this.excludeOutsideOperations(
       this.toConnectionResults(uniqueByDeparture, departureDateTime),
       dateKey,
       appConfig,
@@ -180,38 +206,46 @@ export class ConnectionService {
     return lo;
   }
 
-  private static excludeAfterOperationsEnd(
+  private static excludeOutsideOperations(
     connections: ConnectionResult[],
     departureDate: string,
-    appConfig?: AppConfigDto | null,
+    appConfig: AppConfigDto,
   ): ConnectionResult[] {
-    if (appConfig && appConfig.operationsEndDate) {
-      const operationsEndDate = new Date(appConfig.operationsEndDate);
-      return connections.filter(
-        (connection) =>
-          connection.departureDate <= operationsEndDate ||
-          connection.goesOnlyOn.includes(departureDate),
-      );
-    } else {
+    const operationsStartDate = appConfig.operationsStartDate
+      ? new Date(appConfig.operationsStartDate)
+      : null;
+    const operationsEndDate = appConfig.operationsEndDate
+      ? new Date(appConfig.operationsEndDate)
+      : null;
+
+    if (!operationsStartDate && !operationsEndDate) {
       return connections;
     }
+
+    return connections.filter((connection) => {
+      if (connection.goesOnlyOn.includes(departureDate)) {
+        return true;
+      }
+      if (
+        operationsStartDate &&
+        connection.departureDate < operationsStartDate
+      ) {
+        return false;
+      }
+      if (operationsEndDate && connection.departureDate > operationsEndDate) {
+        return false;
+      }
+      return true;
+    });
   }
 
   private static minutesFromMidnight(date: Date) {
     return date.getHours() * 60 + date.getMinutes();
   }
 
-  private static toDateKey(date: Date) {
-    const year = date.getFullYear().toString();
-    let month = (date.getMonth() + 1).toString();
-    let day = date.getDate().toString();
-    if (month.length === 1) {
-      month = "0" + month;
-    }
-    if (day.length === 1) {
-      day = "0" + day;
-    }
-    return year + "-" + month + "-" + day;
+  private static dateFromKey(dateKey: string) {
+    const [year, month, day] = dateKey.split("-").map(Number);
+    return new Date(year, month - 1, day);
   }
 
   private static dateWithMinutes(baseDate: Date, minutesFromMidnight: number) {
@@ -219,6 +253,8 @@ export class ConnectionService {
     date.setHours(
       Math.floor(minutesFromMidnight / 60),
       minutesFromMidnight % 60,
+      0,
+      0,
     );
     return date;
   }
@@ -240,59 +276,7 @@ export class ConnectionService {
   private static nextDayAtMidnight(date: Date) {
     const tomorrow = new Date(date);
     tomorrow.setDate(date.getDate() + 1);
-    tomorrow.setHours(0);
-    tomorrow.setMinutes(0);
-    tomorrow.setSeconds(0);
+    tomorrow.setHours(0, 0, 0, 0);
     return tomorrow;
-  }
-
-  public static formatMinutesToHhMm(minutes: number) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
-  }
-
-  public static getDateTimeStringFromNowToDate(date: Date) {
-    const nowDate = new Date();
-    const seconds = (date.getTime() - nowDate.getTime()) / 1000;
-    const todayDateString =
-      nowDate.getDate() +
-      "-" +
-      nowDate.getMonth() +
-      "-" +
-      nowDate.getFullYear();
-    const dateDateString =
-      date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear();
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-
-    if (todayDateString !== dateDateString) {
-      return moment(date).calendar(undefined, {
-        lastDay: i18n.t("momentCalendarTranslations.lastDay"),
-        sameDay: i18n.t("momentCalendarTranslations.sameDay"),
-        nextDay: i18n.t("momentCalendarTranslations.nextDay"),
-        lastWeek: i18n.t("momentCalendarTranslations.lastWeek"),
-        nextWeek: i18n.t("momentCalendarTranslations.nextWeek"),
-        sameElse: i18n.t("momentCalendarTranslations.sameElse"),
-      });
-    }
-
-    if (h <= 0) {
-      return moment().to(date);
-    }
-
-    return i18n.t("time.in") + " " + (h && h + " h " + m + " min");
-  }
-
-  public static getDurationBetweenTwoTimes(
-    departureMinutes: number,
-    arrivalMinutes: number,
-  ) {
-    let duration = arrivalMinutes - departureMinutes;
-    if (duration < 0) {
-      duration += 1440;
-    }
-
-    return duration + " min";
   }
 }

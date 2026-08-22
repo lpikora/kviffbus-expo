@@ -2,7 +2,11 @@ import { memo } from "react";
 import { StyleSheet } from "react-native";
 
 import { Spacing } from "@/constants/theme";
-import { ConnectionService } from "@/services/connectionService";
+import {
+  formatMinutesToHhMm,
+  getDateTimeStringFromNowToDate,
+  getDurationBetweenTwoTimes,
+} from "@/utils/format-time";
 import { BusIcon } from "./bus-icon";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
@@ -24,14 +28,10 @@ export const ResultsListItem = memo(function ResultsListItem({
   toName,
   departureDate,
 }: Props) {
-  const timeToDeparture =
-    ConnectionService.getDateTimeStringFromNowToDate(departureDate);
-  const durationTime = ConnectionService.getDurationBetweenTwoTimes(
-    timeDeparture,
-    timeArrival,
-  );
-  const departureLabel = ConnectionService.formatMinutesToHhMm(timeDeparture);
-  const arrivalLabel = ConnectionService.formatMinutesToHhMm(timeArrival);
+  const timeToDeparture = getDateTimeStringFromNowToDate(departureDate);
+  const durationTime = getDurationBetweenTwoTimes(timeDeparture, timeArrival);
+  const departureLabel = formatMinutesToHhMm(timeDeparture);
+  const arrivalLabel = formatMinutesToHhMm(timeArrival);
 
   return (
     <ThemedView style={styles.container}>

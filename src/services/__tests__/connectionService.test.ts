@@ -208,6 +208,33 @@ describe("ConnectionService.searchConnections", () => {
     ).toHaveLength(1);
   });
 
+  test("hides connections before operationsStartDate unless goesOnlyOn matches", () => {
+    const appConfig = makeAppConfig({
+      operationsStartDate: "2026-07-04 07:00:00",
+    });
+
+    expect(
+      search({
+        appConfig,
+        connections: [makeConnection({ id: 1 })],
+        date: new Date("2026-07-02T10:00:00"),
+      }),
+    ).toHaveLength(0);
+
+    expect(
+      search({
+        appConfig,
+        connections: [
+          makeConnection({
+            id: 2,
+            goesOnlyOn: ["2026-07-02"],
+          }),
+        ],
+        date: new Date("2026-07-02T10:00:00"),
+      }),
+    ).toHaveLength(1);
+  });
+
   test("does not mutate the input connections when searching", () => {
     const late = makeConnection({
       id: 2,
@@ -258,25 +285,49 @@ describe("ConnectionService.searchConnections", () => {
     expect(results).toHaveLength(1);
     expect(results[0].departureDate.getDate()).toBe(5);
   });
-});
 
-describe("ConnectionService.getDurationBetweenTwoTimes", () => {
-  test("returns duration across midnight", () => {
-    expect(ConnectionService.getDurationBetweenTwoTimes(1430, 10)).toBe(
-      "20 min",
-    );
+  test("excludes a connection departing exactly at exception start", () => {
+    const results = search({
+      exceptions: [
+        makeException({
+          id: thermalStop.id,
+          fromDate: "2026-07-04",
+          fromTime: 720,
+          toDate: "2026-07-04",
+          toTime: 840,
+        }),
+      ],
+      date: new Date("2026-07-04T10:00:00"),
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0].departureDate.getDate()).toBe(5);
   });
 
-  test("returns duration on the same day", () => {
-    expect(ConnectionService.getDurationBetweenTwoTimes(750, 775)).toBe(
-      "25 min",
-    );
-  });
-});
+  test("excludes a night arrival that lands in a destination exception", () => {
+    const results = search({
+      connections: [
+        makeConnection({
+          id: 1,
+          departureArrivalTimes: {
+            timeDeparture: 1430,
+            timeArrival: 10,
+          },
+        }),
+      ],
+      exceptions: [
+        makeException({
+          id: puppStop.id,
+          fromDate: "2026-07-05",
+          fromTime: 0,
+          toDate: "2026-07-05",
+          toTime: 60,
+        }),
+      ],
+      date: new Date("2026-07-04T23:00:00"),
+    });
 
-describe("ConnectionService.formatMinutesToHhMm", () => {
-  test("formats minutes from midnight", () => {
-    expect(ConnectionService.formatMinutesToHhMm(720)).toBe("12:00");
-    expect(ConnectionService.formatMinutesToHhMm(5)).toBe("00:05");
+    expect(results).toHaveLength(1);
+    expect(results[0].departureDate.getDate()).toBe(5);
   });
 });
