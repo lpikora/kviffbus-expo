@@ -1,5 +1,5 @@
 import { AppError } from "@/errors/appError";
-import { ConnectionService } from "@/services/connectionService";
+import { searchConnections } from "@/services/connection-service";
 import { ErrorCode } from "@/types/appError";
 import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
 import { TypeOfDepartureDateTimeType } from "@/types/departureDateTimeType";
@@ -45,7 +45,7 @@ function search(options: {
   toStop?: typeof puppStop | null;
   date: Date;
 }) {
-  return ConnectionService.searchConnections(
+  return searchConnections(
     options.connectionsMap ??
       toConnectionsMap(options.connections ?? [makeConnection()]),
     options.stops ?? stops,
@@ -62,7 +62,7 @@ function search(options: {
   );
 }
 
-describe("ConnectionService.searchConnections", () => {
+describe("searchConnections", () => {
   test("throws MissingStops when a stop is missing", () => {
     expect(() =>
       search({ fromStop: null, date: new Date("2026-07-04T10:00:00") }),

@@ -8,7 +8,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useRootStore } from "@/stores/rootStore";
+import { runConnectionSearch } from "@/stores/run-connection-search";
+import { useSearchStore } from "@/stores/search-store";
 import { ErrorCode } from "@/types/appError";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
@@ -16,16 +17,15 @@ import { useTranslation } from "react-i18next";
 export default function ConnectionScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const fromStop = useRootStore((state) => state.fromStop);
-  const toStop = useRootStore((state) => state.toStop);
-  const departureDateTime = useRootStore((state) => state.departureDateTime);
-  const setDepartureDateTime = useRootStore(
+  const fromStop = useSearchStore((state) => state.fromStop);
+  const toStop = useSearchStore((state) => state.toStop);
+  const departureDateTime = useSearchStore((state) => state.departureDateTime);
+  const setDepartureDateTime = useSearchStore(
     (state) => state.setDepartureDateTime,
   );
-  const searchConnections = useRootStore((state) => state.searchConnections);
-  const setError = useRootStore((state) => state.setError);
-  const swapStops = useRootStore((state) => state.swapStops);
-  const error = useRootStore((state) => state.error);
+  const setError = useSearchStore((state) => state.setError);
+  const swapStops = useSearchStore((state) => state.swapStops);
+  const error = useSearchStore((state) => state.error);
 
   return (
     <ThemedView style={styles.container}>
@@ -109,7 +109,7 @@ export default function ConnectionScreen() {
               setError(ErrorCode.MissingStops);
               return;
             }
-            searchConnections();
+            runConnectionSearch();
             router.navigate("/results");
           }}
         >

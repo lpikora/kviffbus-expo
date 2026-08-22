@@ -5,11 +5,11 @@ import { useTranslation } from "react-i18next";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
-import { useRootStore } from "@/stores/rootStore";
+import { useDataStore } from "@/stores/data-store";
 
 export default function MapScreen() {
   const { t } = useTranslation();
-  const mapImageUrl = useRootStore(
+  const mapImageUrl = useDataStore(
     (state) => state.appConfig?.busStopsMapImageUrl,
   );
 

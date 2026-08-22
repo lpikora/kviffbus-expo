@@ -1,13 +1,16 @@
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 
-import { useRootStore } from "@/stores/rootStore";
+import { toErrorCode } from "@/errors/appError";
+import { useDataStore } from "@/stores/data-store";
+import { useSearchStore } from "@/stores/search-store";
 
 const HYDRATION_TIMEOUT_MS = 3000;
 
-function waitForHydration(): Promise<void> {
-  const persist = useRootStore.persist;
-
+function waitForStoreHydration(persist: {
+  hasHydrated: () => boolean;
+  onFinishHydration: (fn: () => void) => () => void;
+}): Promise<void> {
   return new Promise((resolve) => {
     if (persist.hasHydrated()) {
       resolve();
@@ -43,10 +46,17 @@ function waitForHydration(): Promise<void> {
   });
 }
 
+function waitForHydration(): Promise<void> {
+  return Promise.all([
+    waitForStoreHydration(useDataStore.persist),
+    waitForStoreHydration(useSearchStore.persist),
+  ]).then(() => undefined);
+}
+
 export const useInitData = () => {
   const [isReady, setIsReady] = useState(false);
-  const initData = useRootStore((state) => state.initData);
-  const syncWithApi = useRootStore((state) => state.syncWithApi);
+  const initData = useDataStore((state) => state.initData);
+  const syncWithApi = useDataStore((state) => state.syncWithApi);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,8 +67,10 @@ export const useInitData = () => {
         if (cancelled) {
           return;
         }
+        useSearchStore.getState().setError(null);
         await initData();
       } catch (error) {
+        useSearchStore.getState().setError(toErrorCode(error));
         console.warn("Init data failed", error);
       } finally {
         if (!cancelled) {

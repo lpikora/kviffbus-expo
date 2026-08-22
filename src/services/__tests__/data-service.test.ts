@@ -1,9 +1,9 @@
 import { AppError } from "@/errors/appError";
 import {
-  DataService,
   DEFAULT_DATA_URL,
+  getRemoteData,
   parseDataDto,
-} from "@/services/dataService";
+} from "@/services/data-service";
 import { ErrorCode } from "@/types/appError";
 
 import { makeDataDto } from "./fixtures";
@@ -60,7 +60,7 @@ describe("parseDataDto", () => {
   });
 });
 
-describe("DataService.getRemoteData", () => {
+describe("getRemoteData", () => {
   const originalFetch = globalThis.fetch;
 
   afterEach(() => {
@@ -75,7 +75,7 @@ describe("DataService.getRemoteData", () => {
       json: async () => payload,
     }));
 
-    await expect(DataService.getRemoteData()).resolves.toEqual(payload);
+    await expect(getRemoteData()).resolves.toEqual(payload);
     expect(fetchMock).toHaveBeenCalledWith(
       DEFAULT_DATA_URL,
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
@@ -89,7 +89,7 @@ describe("DataService.getRemoteData", () => {
       json: async () => payload,
     }));
 
-    await DataService.getRemoteData("https://example.com/custom.json");
+    await getRemoteData("https://example.com/custom.json");
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://example.com/custom.json",
@@ -102,7 +102,7 @@ describe("DataService.getRemoteData", () => {
       ok: false,
     }));
 
-    await expect(DataService.getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData()).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
@@ -114,7 +114,7 @@ describe("DataService.getRemoteData", () => {
       json: async () => ({ broken: true }),
     }));
 
-    await expect(DataService.getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData()).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });

@@ -13,12 +13,12 @@ import { ThemedView } from "@/components/themed-view";
 import { useTheme } from "@/hooks/use-theme";
 import { useConnectionListKeyExtractor } from "@/hooks/use-connection-list-key-extractor";
 import { useConnectionListRenderItem } from "@/hooks/use-connection-list-render-item";
-import { useRootStore } from "@/stores/rootStore";
+import { useSearchStore } from "@/stores/search-store";
 
 export default function ResultsScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { results, fromStop, toStop, error, isLoading } = useRootStore(
+  const { results, fromStop, toStop, error, isLoading } = useSearchStore(
     useShallow((state) => ({
       results: state.results,
       fromStop: state.fromStop,

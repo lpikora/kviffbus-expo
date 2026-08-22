@@ -9,7 +9,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useRootStore } from "@/stores/rootStore";
+import { useDataStore } from "@/stores/data-store";
 
 export default function AboutScreen() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export default function AboutScreen() {
     bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
   };
   const theme = useTheme();
-  const appConfig = useRootStore((state) => state.appConfig);
+  const appConfig = useDataStore((state) => state.appConfig);
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
 
   const contentPlatformStyle = Platform.select({

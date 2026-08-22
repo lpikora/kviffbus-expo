@@ -9,7 +9,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useRootStore } from "@/stores/rootStore";
+import { useDataStore } from "@/stores/data-store";
+import { useSearchStore } from "@/stores/search-store";
 import { StopDto, TypeOfStopType } from "@/types/stopDto";
 
 function parseField(
@@ -31,9 +32,9 @@ export default function StopPickerScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
-  const stops = useRootStore((state) => state.stops);
+  const stops = useDataStore((state) => state.stops);
 
-  const selectedStopId = useRootStore((state) => {
+  const selectedStopId = useSearchStore((state) => {
     if (field === "from") {
       return state.fromStop?.id;
     }
@@ -42,8 +43,8 @@ export default function StopPickerScreen() {
     }
     return undefined;
   });
-  const setFromStop = useRootStore((state) => state.setFromStop);
-  const setToStop = useRootStore((state) => state.setToStop);
+  const setFromStop = useSearchStore((state) => state.setFromStop);
+  const setToStop = useSearchStore((state) => state.setToStop);
 
   const handleSelect = useCallback(
     (stop: StopDto) => {
