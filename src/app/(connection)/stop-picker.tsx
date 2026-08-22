@@ -1,10 +1,9 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { StopPickerItem } from "@/components/stop-picker-item";
-import { MaxContentWidth, radius, space } from "@/constants/theme";
+import { MaxContentWidth, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
@@ -16,7 +15,6 @@ export default function StopPickerScreen() {
     field?: TypeOfStopType;
   }>();
   const field = parseStopField(fieldParam);
-  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
@@ -81,17 +79,5 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: "center",
     width: "100%",
-  },
-  mapButton: {
-    width: "100%",
-    maxWidth: MaxContentWidth,
-  },
-  mapButtonInner: {
-    padding: space[16],
-    borderRadius: radius.md,
-    alignItems: "center",
-  },
-  pressed: {
-    opacity: 0.6,
   },
 });

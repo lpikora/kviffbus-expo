@@ -28,16 +28,6 @@ export default function ConnectionLayout() {
           };
         }}
       />
-      <Stack.Screen
-        name="map"
-        options={{
-          presentation: "modal",
-          title: t("selectStopFromMapScreen.title"),
-          sheetGrabberVisible: true,
-          sheetAllowedDetents: [0.5, 1.0],
-          contentStyle: { backgroundColor: "transparent" },
-        }}
-      />
     </Stack>
   );
 }

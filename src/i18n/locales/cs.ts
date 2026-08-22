@@ -32,12 +32,6 @@ export default {
   time: {
     in: "za",
   },
-  selectStopFromMapScreen: {
-    title: "Mapa zastávek",
-    openMap: "Zobrazit mapu zastávek",
-    comingSoon:
-      "Interaktivní mapa se připravuje. Zatím tu je oficiální plán festivalové dopravy.",
-  },
   Drawer: {
     LinkToPdfTimetable: "Jízdní řády v PDF",
     LinkToMapImage: "Podrobná mapa zastávek",

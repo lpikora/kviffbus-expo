@@ -31,12 +31,6 @@ export default {
   time: {
     in: "in",
   },
-  selectStopFromMapScreen: {
-    title: "Stop map",
-    openMap: "View stop map",
-    comingSoon:
-      "The interactive map is coming soon. For now, here is the official festival transport plan.",
-  },
   Drawer: {
     LinkToPdfTimetable: "Timetable in PDF",
     LinkToMapImage: "Detailed bus stop map",
