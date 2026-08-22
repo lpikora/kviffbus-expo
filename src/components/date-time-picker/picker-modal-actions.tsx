@@ -1,5 +1,6 @@
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 
 import { dateTimePickerStyles as styles } from "./styles";
@@ -19,22 +20,20 @@ export function PickerModalActions({
 }: PickerModalActionsProps) {
   return (
     <View style={styles.modalButtons}>
-      <Pressable
-        accessibilityRole="button"
+      <AppPressable
         accessibilityLabel={cancelLabel}
-        style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
+        style={styles.modalButton}
         onPress={onCancel}
       >
         <AppText>{cancelLabel}</AppText>
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
+      </AppPressable>
+      <AppPressable
         accessibilityLabel={confirmLabel}
-        style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
+        style={styles.modalButton}
         onPress={onConfirm}
       >
         <AppText>{confirmLabel}</AppText>
-      </Pressable>
+      </AppPressable>
     </View>
   );
 }

@@ -1,14 +1,20 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { runConnectionSearch } from "@/actions/run-connection-search";
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { DateTimePicker } from "@/components/date-time-picker/index";
 import { ErrorMessage } from "@/components/error-message";
 import { StopPairCard } from "@/components/stop-pair-card";
-import { BottomTabInset, MaxContentWidth, radius, space } from "@/constants/theme";
+import {
+  BottomTabInset,
+  MaxContentWidth,
+  radius,
+  space,
+} from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useSearchStore } from "@/stores/search-store";
 import { ErrorCode } from "@/types/appError";
@@ -49,23 +55,18 @@ export default function ConnectionScreen() {
           />
         </View>
 
-        <Pressable
-          accessibilityRole="button"
+        <AppPressable
           accessibilityLabel={t("SearchButton.search")}
-          style={({ pressed }) => [
+          style={[
             styles.searchButton,
             { backgroundColor: theme.colors.accent },
-            pressed && styles.pressed,
           ]}
           onPress={handleSearch}
         >
-          <AppText
-            variant="bodyBold"
-            style={{ color: theme.colors.onAccent }}
-          >
+          <AppText variant="bodyBold" style={{ color: theme.colors.onAccent }}>
             {t("SearchButton.search")}
           </AppText>
-        </Pressable>
+        </AppPressable>
       </SafeAreaView>
     </View>
   );
@@ -89,9 +90,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.lg,
     overflow: "hidden",
-  },
-  pressed: {
-    opacity: 0.6,
   },
   searchButton: {
     marginTop: space[8],

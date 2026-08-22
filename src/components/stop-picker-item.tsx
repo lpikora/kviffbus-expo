@@ -1,6 +1,7 @@
 import { memo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { MaxContentWidth, radius, space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -20,10 +21,9 @@ export const StopPickerItem = memo(function StopPickerItem({
   const theme = useTheme();
 
   return (
-    <Pressable
-      style={({ pressed }) => [styles.stopItem, pressed && styles.pressed]}
+    <AppPressable
+      style={styles.stopItem}
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityLabel={stop.name}
     >
@@ -39,7 +39,7 @@ export const StopPickerItem = memo(function StopPickerItem({
       >
         <AppText>{stop.name}</AppText>
       </View>
-    </Pressable>
+    </AppPressable>
   );
 });
 
@@ -51,8 +51,5 @@ const styles = StyleSheet.create({
   stopCard: {
     padding: space[16],
     borderRadius: radius.md,
-  },
-  pressed: {
-    opacity: 0.6,
   },
 });

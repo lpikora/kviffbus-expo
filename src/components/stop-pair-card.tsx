@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
+import { AppPressable } from "@/components/app-pressable";
 import { ArrowUpDownIcon } from "@/components/icons/arrow-up-down-icon";
 import { StopField } from "@/components/stop-field";
 import { radius, space } from "@/constants/theme";
@@ -25,14 +26,13 @@ export function StopPairCard() {
           <StopField field="to" stopName={toStop?.name} />
         </View>
 
-        <Pressable
-          accessibilityRole="button"
+        <AppPressable
           accessibilityLabel={t("a11y.swapStops")}
-          style={({ pressed }) => [styles.swapButton, pressed && styles.pressed]}
+          style={styles.swapButton}
           onPress={swapStops}
         >
           <ArrowUpDownIcon />
-        </Pressable>
+        </AppPressable>
       </View>
     </View>
   );
@@ -59,8 +59,5 @@ const styles = StyleSheet.create({
     padding: space[24],
     justifyContent: "center",
     alignItems: "center",
-  },
-  pressed: {
-    opacity: 0.6,
   },
 });

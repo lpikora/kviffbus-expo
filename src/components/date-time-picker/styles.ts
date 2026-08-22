@@ -10,9 +10,6 @@ export const dateTimePickerStyles = StyleSheet.create({
     paddingVertical: space[16],
     gap: space[8],
   },
-  pressed: {
-    opacity: 0.6,
-  },
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",

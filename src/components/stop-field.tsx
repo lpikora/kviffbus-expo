@@ -1,7 +1,8 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { space } from "@/constants/theme";
 import { TypeOfStopType } from "@/types/stopDto";
@@ -18,10 +19,9 @@ export function StopField({ field, stopName }: Props) {
   const valueLabel = stopName ?? t("StopTextInput.selectStop");
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <AppPressable
       accessibilityLabel={`${fieldLabel}, ${valueLabel}`}
-      style={({ pressed }) => [styles.stopRow, pressed && styles.pressed]}
+      style={styles.stopRow}
       onPress={() => router.navigate(`/stop-picker?field=${field}`)}
     >
       <AppText variant="caption" tone="muted">
@@ -30,7 +30,7 @@ export function StopField({ field, stopName }: Props) {
       <AppText variant="bodyBold">
         {stopName ?? t("StopTextInput.selectStop")}
       </AppText>
-    </Pressable>
+    </AppPressable>
   );
 }
 
@@ -39,8 +39,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: space[24],
     paddingVertical: space[16],
     gap: space[4],
-  },
-  pressed: {
-    opacity: 0.6,
   },
 });

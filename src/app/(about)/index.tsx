@@ -1,16 +1,10 @@
 import Constants from "expo-constants";
 import { Href } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  Linking,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Linking, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { ExternalLink } from "@/components/external-link";
 import { BottomTabInset, MaxContentWidth, space } from "@/constants/theme";
@@ -74,7 +68,7 @@ export default function AboutScreen() {
               </AppText>
             </ExternalLink>
             {appConfig.contactEmail ? (
-              <Pressable
+              <AppPressable
                 accessibilityRole="link"
                 accessibilityLabel={`${t("App.Contact")}: ${appConfig.contactEmail}`}
                 onPress={() =>
@@ -84,7 +78,7 @@ export default function AboutScreen() {
                 <AppText variant="caption" tone="accent">
                   {t("App.Contact")}: {appConfig.contactEmail}
                 </AppText>
-              </Pressable>
+              </AppPressable>
             ) : null}
           </View>
         ) : null}

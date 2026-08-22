@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Pressable } from "react-native";
-
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { ClockIcon } from "@/components/icons/clock-icon";
 
@@ -18,14 +17,13 @@ export function DateTimePickerTrigger({
   const { t } = useTranslation();
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <AppPressable
       accessibilityLabel={`${t("selectTime.pickerTitle")}, ${value}`}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={styles.row}
       onPress={onPress}
     >
       <ClockIcon />
       <AppText>{value}</AppText>
-    </Pressable>
+    </AppPressable>
   );
 }

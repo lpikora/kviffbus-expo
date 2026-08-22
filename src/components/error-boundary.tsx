@@ -1,8 +1,9 @@
 import { type ErrorBoundaryProps } from "expo-router";
 import { useEffect } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
+import { AppPressable } from "@/components/app-pressable";
 import { AppText } from "@/components/app-text";
 import { ErrorMessage } from "@/components/error-message";
 import { space } from "@/constants/theme";
@@ -20,16 +21,15 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
     <View style={[styles.fallback, { backgroundColor: theme.colors.bg }]}>
       <ErrorMessage code={ErrorCode.Unknown} />
-      <Pressable
-        accessibilityRole="button"
+      <AppPressable
         accessibilityLabel={t("ErrorBoundary.retry")}
         onPress={() => {
           void retry();
         }}
-        style={({ pressed }) => [styles.retry, pressed && styles.pressed]}
+        style={styles.retry}
       >
         <AppText tone="accent">{t("ErrorBoundary.retry")}</AppText>
-      </Pressable>
+      </AppPressable>
     </View>
   );
 }
@@ -45,8 +45,5 @@ const styles = StyleSheet.create({
   retry: {
     paddingVertical: space[8],
     paddingHorizontal: space[16],
-  },
-  pressed: {
-    opacity: 0.6,
   },
 });
