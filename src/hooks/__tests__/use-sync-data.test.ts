@@ -165,7 +165,14 @@ describe("useInitData", () => {
   });
 
   test("records an error and still finishes when local load fails", async () => {
+    let resolveRemote: ((data: typeof bundled) => void) | undefined;
     getLocalDataMock.mockRejectedValue(new AppError(ErrorCode.DataLoadFailed));
+    getRemoteDataMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveRemote = resolve;
+        }),
+    );
 
     await renderHook(() => useInitData());
 
@@ -178,6 +185,27 @@ describe("useInitData", () => {
     await waitFor(() => {
       expect(getRemoteDataMock).toHaveBeenCalled();
     });
+    expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
+
+    await act(async () => {
+      resolveRemote?.(bundled);
+    });
+
+    await waitFor(() => {
+      expect(useSearchStore.getState().error).toBeNull();
+    });
+  });
+
+  test("keeps the init error when the background sync also fails", async () => {
+    getLocalDataMock.mockRejectedValue(new AppError(ErrorCode.DataLoadFailed));
+    getRemoteDataMock.mockRejectedValue(new AppError(ErrorCode.DataLoadFailed));
+
+    await renderHook(() => useInitData());
+
+    await waitFor(() => {
+      expect(getRemoteDataMock).toHaveBeenCalled();
+    });
+    expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
   });
 
   test("does not sync again on resume before the interval elapses", async () => {

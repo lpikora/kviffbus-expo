@@ -21,6 +21,8 @@ jest.mock("@/services/data-service", () => ({
 }));
 
 import { useDataStore } from "@/stores/data-store";
+import { useSearchStore } from "@/stores/search-store";
+import { ErrorCode } from "@/types/appError";
 
 const memoryStorage = clientStorage as ReturnType<typeof createMemoryStorage>;
 const getLocalDataMock = getLocalData as jest.MockedFunction<typeof getLocalData>;
@@ -66,8 +68,11 @@ describe("useDataStore", () => {
     getRemoteDataMock.mockReset();
     jest.spyOn(console, "warn").mockImplementation(() => {});
     useDataStore.getState().reset();
+    useSearchStore.getState().reset();
     await useDataStore.persist.rehydrate();
+    await useSearchStore.persist.rehydrate();
     useDataStore.getState().reset();
+    useSearchStore.getState().reset();
   });
 
   afterEach(() => {
@@ -156,6 +161,41 @@ describe("useDataStore", () => {
       "missing bundle",
     );
     expect(useDataStore.getState().stops).toEqual([]);
+  });
+
+  test("syncWithApi clears a stale load error after a successful fetch", async () => {
+    useSearchStore.getState().setError(ErrorCode.DataLoadFailed);
+    getRemoteDataMock.mockResolvedValue(remoteNewer);
+
+    await useDataStore.getState().syncWithApi();
+
+    expect(useSearchStore.getState().error).toBeNull();
+  });
+
+  test("syncWithApi clears a stale load error when remote data is already current", async () => {
+    seedPersisted(bundled);
+    useSearchStore.getState().setError(ErrorCode.Unknown);
+    getRemoteDataMock.mockResolvedValue(bundled);
+
+    await useDataStore.getState().syncWithApi();
+
+    expect(useSearchStore.getState().error).toBeNull();
+  });
+
+  test("syncWithApi leaves search errors and load errors after a failed fetch", async () => {
+    useSearchStore.getState().setError(ErrorCode.MissingStops);
+    getRemoteDataMock.mockResolvedValue(remoteNewer);
+
+    await useDataStore.getState().syncWithApi();
+
+    expect(useSearchStore.getState().error).toBe(ErrorCode.MissingStops);
+
+    useSearchStore.getState().setError(ErrorCode.DataLoadFailed);
+    getRemoteDataMock.mockRejectedValue(new Error("offline"));
+
+    await useDataStore.getState().syncWithApi();
+
+    expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
   });
 
   test("syncWithApi applies remote data when persist has no appConfig", async () => {

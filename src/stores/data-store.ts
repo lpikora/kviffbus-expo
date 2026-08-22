@@ -1,5 +1,7 @@
 import { getLocalData, getRemoteData } from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
+import { useSearchStore } from "@/stores/search-store";
+import { ErrorCode } from "@/types/appError";
 import { isNewerImportVersion } from "@/utils/import-version";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ConnectionsMap } from "@/types/connectionDto";
@@ -38,6 +40,16 @@ export const dataStoreDefaultValues: DataStoreState = {
   appConfig: null,
 };
 
+function clearStaleLoadError() {
+  const error = useSearchStore.getState().error;
+  if (
+    error === ErrorCode.DataLoadFailed ||
+    error === ErrorCode.Unknown
+  ) {
+    useSearchStore.getState().setError(null);
+  }
+}
+
 export const useDataStore = create<DataStore>()(
   persist(
     (set, get) => ({
@@ -54,6 +66,7 @@ export const useDataStore = create<DataStore>()(
               currentAppConfig.importVersion,
             )
           ) {
+            clearStaleLoadError();
             return;
           }
 
@@ -63,6 +76,7 @@ export const useDataStore = create<DataStore>()(
             stopExceptions: remoteData.stopExceptions,
             appConfig: remoteData.appConfig,
           });
+          clearStaleLoadError();
         } catch (error) {
           // Ignore sync failures in production — festival venues often have spotty connectivity
           if (__DEV__) {
