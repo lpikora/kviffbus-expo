@@ -32,6 +32,32 @@ describe("parseDataDto", () => {
       expect((error as AppError).code).toBe(ErrorCode.DataLoadFailed);
     }
   });
+
+  test("strips connection annotation fields that are not in the JSON schema", () => {
+    const payload = makeDataDto();
+    const key = Object.keys(payload.connections)[0];
+    const connection = payload.connections[key][0];
+
+    const parsed = parseDataDto({
+      ...payload,
+      connections: {
+        ...payload.connections,
+        [key]: [
+          {
+            ...connection,
+            fromName: "Hotel Thermal",
+            toName: "GH Pupp",
+            departureDate: "2026-07-04",
+          },
+        ],
+      },
+    });
+
+    expect(parsed.connections[key][0]).toEqual(connection);
+    expect(parsed.connections[key][0]).not.toHaveProperty("fromName");
+    expect(parsed.connections[key][0]).not.toHaveProperty("toName");
+    expect(parsed.connections[key][0]).not.toHaveProperty("departureDate");
+  });
 });
 
 describe("DataService.getRemoteData", () => {

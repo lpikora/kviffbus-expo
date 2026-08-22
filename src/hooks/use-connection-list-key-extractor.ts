@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 
-import { ConnectionDto } from "@/types/connectionDto";
+import { ConnectionResult } from "@/types/connectionResult";
 
 export function useConnectionListKeyExtractor() {
   return useCallback(
-    (item: ConnectionDto) =>
-      `${item.id}-${item.departureDate?.toISOString() ?? "unknown"}`,
+    (item: ConnectionResult) =>
+      `${item.id}-${item.departureDate.toISOString()}`,
     [],
   );
 }

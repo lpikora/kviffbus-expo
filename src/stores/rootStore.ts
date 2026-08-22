@@ -5,7 +5,8 @@ import { clientStorage } from "@/services/storage";
 import { isNewerImportVersion } from "@/utils/import-version";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
-import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
+import { ConnectionsMap } from "@/types/connectionDto";
+import { ConnectionResult } from "@/types/connectionResult";
 import {
   DepartureDateTimeType,
   TypeOfDepartureDateTimeType,
@@ -30,7 +31,7 @@ export interface StopsStoreState {
   connections: ConnectionsMap;
   stopExceptions: StopExceptionDto[];
   departureDateTime: DepartureDateTimeType;
-  results: ConnectionDto[];
+  results: ConnectionResult[];
   appConfig: AppConfigDto | null;
   isLoading: boolean;
   error: ErrorCode | null;
@@ -45,7 +46,7 @@ export interface StopsStoreActions {
   setDepartureDateTime: (
     departureDateTime: Partial<DepartureDateTimeType>,
   ) => void;
-  setResults: (results: ConnectionDto[]) => void;
+  setResults: (results: ConnectionResult[]) => void;
   setAppConfig: (appConfig: AppConfigDto | null) => void;
   setError: (error: ErrorCode | null) => void;
   swapStops: () => void;

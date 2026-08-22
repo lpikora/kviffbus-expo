@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-const stopSchema = z.object({
+export const stopSchema = z.object({
   id: z.number(),
   name: z.string(),
   lat: z.string(),
   lng: z.string(),
 });
 
-const connectionSchema = z.object({
+export const connectionSchema = z.object({
   id: z.number(),
   lineId: z.string(),
   from: z.number(),
@@ -21,7 +21,7 @@ const connectionSchema = z.object({
   notGoesOn: z.array(z.string()),
 });
 
-const stopExceptionSchema = z.object({
+export const stopExceptionSchema = z.object({
   stopName: z.string(),
   fromDate: z.string(),
   fromTime: z.string(),
@@ -29,7 +29,7 @@ const stopExceptionSchema = z.object({
   toTime: z.string(),
 });
 
-const appConfigSchema = z.object({
+export const appConfigSchema = z.object({
   timetablesPdfUrl: z.string(),
   busStopsMapImageUrl: z.string(),
   officialKviffWebUrl: z.string(),

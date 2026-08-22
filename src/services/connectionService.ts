@@ -3,6 +3,7 @@ import i18n from "@/i18n";
 import { AppConfigDto } from "@/types/appConfigDto";
 import { ErrorCode } from "@/types/appError";
 import { ConnectionDto, ConnectionsMap } from "@/types/connectionDto";
+import { ConnectionResult } from "@/types/connectionResult";
 import {
   DepartureDateTimeType,
   TypeOfDepartureDateTimeType,
@@ -25,7 +26,7 @@ export class ConnectionService {
     exceptions: StopExceptionDto[],
     appConfig: AppConfigDto | null,
     params: SearchParams,
-  ): ConnectionDto[] {
+  ): ConnectionResult[] {
     const { fromStop, toStop, departureDateTime: depTime } = params;
 
     if (!fromStop || !toStop) {
@@ -52,7 +53,6 @@ export class ConnectionService {
       group,
       this.getMinutesFromDate(departureDateTime),
       departureDateTime,
-      stops,
       appConfig,
     );
     const nextDayFromDepartureDateTime = this.getNextDayDate(departureDateTime);
@@ -60,13 +60,14 @@ export class ConnectionService {
       group,
       0,
       nextDayFromDepartureDateTime,
-      stops,
       appConfig,
     );
 
     return this.filterToStopExceptions(
       departureDayConnections.concat(departureNextDayConnections),
       exceptions,
+      fromStop.name,
+      toStop.name,
     );
   }
 
@@ -92,36 +93,26 @@ export class ConnectionService {
   }
 
   private static filterToStopExceptions(
-    connections: ConnectionDto[],
+    connections: ConnectionResult[],
     exceptions: StopExceptionDto[],
-  ): ConnectionDto[] {
+    fromStopName: string,
+    toStopName: string,
+  ): ConnectionResult[] {
     return connections.filter((connection) => {
       const arrivalDateTime = this.dateWithMinutes(
-        connection.departureDate!,
+        connection.departureDate,
         connection.departureArrivalTimes.timeArrival,
       );
       const departureDateTime = this.dateWithMinutes(
-        connection.departureDate!,
+        connection.departureDate,
         connection.departureArrivalTimes.timeDeparture,
       );
 
-      if (
-        this.hasStopException(
-          exceptions,
-          connection.toName || "",
-          arrivalDateTime,
-        )
-      ) {
+      if (this.hasStopException(exceptions, toStopName, arrivalDateTime)) {
         return false;
       }
 
-      if (
-        this.hasStopException(
-          exceptions,
-          connection.fromName || "",
-          departureDateTime,
-        )
-      ) {
+      if (this.hasStopException(exceptions, fromStopName, departureDateTime)) {
         return false;
       }
 
@@ -133,7 +124,6 @@ export class ConnectionService {
     group: ConnectionDto[],
     minDepartureMinutes: number,
     departureDateTime: Date,
-    stops: StopDto[],
     appConfig?: AppConfigDto | null,
   ) {
     const departureDate = this.getDateStringFromDate(departureDateTime);
@@ -161,15 +151,13 @@ export class ConnectionService {
           array[index - 1].departureArrivalTimes.timeDeparture,
     );
 
-    const connectionsWithStopNames =
-      this.setStopNamesAndDepartureDateToConnections(
-        nonDuplicitConnections,
-        departureDateTime,
-        stops,
-      );
+    const connectionsWithDepartureDate = this.setDepartureDateOnConnections(
+      nonDuplicitConnections,
+      departureDateTime,
+    );
 
     return this.filterConnectionAfterOperationsEndDate(
-      connectionsWithStopNames,
+      connectionsWithDepartureDate,
       departureDate,
       appConfig,
     );
@@ -196,15 +184,15 @@ export class ConnectionService {
   }
 
   private static filterConnectionAfterOperationsEndDate(
-    connections: ConnectionDto[],
+    connections: ConnectionResult[],
     departureDate: string,
     appConfig?: AppConfigDto | null,
   ) {
     if (appConfig && appConfig.operationsEndDate) {
       const operationsEndDate = new Date(appConfig.operationsEndDate);
       return connections.filter(
-        (connection: ConnectionDto) =>
-          connection.departureDate! <= operationsEndDate ||
+        (connection) =>
+          connection.departureDate <= operationsEndDate ||
           connection.goesOnlyOn.includes(departureDate),
       );
     } else {
@@ -229,14 +217,6 @@ export class ConnectionService {
     return year + "-" + month + "-" + day;
   }
 
-  private static stopsArrayToObject(stops: StopDto[]) {
-    const stopsObject: Record<number, StopDto> = {};
-    for (const stop of stops) {
-      stopsObject[stop.id] = stop;
-    }
-    return stopsObject;
-  }
-
   private static dateWithMinutes(baseDate: Date, minutesFromMidnight: number) {
     const date = new Date(baseDate);
     date.setHours(
@@ -246,18 +226,14 @@ export class ConnectionService {
     return date;
   }
 
-  private static setStopNamesAndDepartureDateToConnections(
+  private static setDepartureDateOnConnections(
     connections: ConnectionDto[],
     desiredDepartureDate: Date,
-    stops: StopDto[],
-  ) {
-    const stopsObject = this.stopsArrayToObject(stops);
+  ): ConnectionResult[] {
     return connections.map((connection) => {
       return {
         ...connection,
         departureArrivalTimes: { ...connection.departureArrivalTimes },
-        fromName: stopsObject[connection.from].name,
-        toName: stopsObject[connection.to].name,
         departureDate: this.dateWithMinutes(
           desiredDepartureDate,
           connection.departureArrivalTimes.timeDeparture,

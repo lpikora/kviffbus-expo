@@ -2,12 +2,12 @@ import { useCallback } from "react";
 import { ListRenderItemInfo } from "react-native";
 
 import { ConnectionListItem } from "@/components/connection-list-item";
-import { ConnectionDto } from "@/types/connectionDto";
+import { ConnectionResult } from "@/types/connectionResult";
 
 export function useConnectionListRenderItem(fromName: string, toName: string) {
   return useCallback(
     function renderConnectionListItem(
-      info: ListRenderItemInfo<ConnectionDto>,
+      info: ListRenderItemInfo<ConnectionResult>,
     ) {
       return (
         <ConnectionListItem

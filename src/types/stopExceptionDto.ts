@@ -1,7 +1,5 @@
-export interface StopExceptionDto {
-  stopName: string;
-  fromDate: string;
-  fromTime: string;
-  toDate: string;
-  toTime: string;
-}
+import { z } from "zod";
+
+import { stopExceptionSchema } from "./dataSchema";
+
+export type StopExceptionDto = z.infer<typeof stopExceptionSchema>;

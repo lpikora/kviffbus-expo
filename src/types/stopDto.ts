@@ -1,8 +1,7 @@
-export interface StopDto {
-  id: number;
-  name: string;
-  lat: string;
-  lng: string;
-}
+import { z } from "zod";
 
-export type TypeOfStopType = 'from' | 'to';
+import { stopSchema } from "./dataSchema";
+
+export type StopDto = z.infer<typeof stopSchema>;
+
+export type TypeOfStopType = "from" | "to";

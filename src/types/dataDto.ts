@@ -1,11 +1,5 @@
-import { AppConfigDto } from "./appConfigDto";
-import { ConnectionsMap } from "./connectionDto";
-import { StopDto } from "./stopDto";
-import { StopExceptionDto } from "./stopExceptionDto";
+import { z } from "zod";
 
-export interface DataDto {
-  stops: StopDto[];
-  connections: ConnectionsMap;
-  appConfig: AppConfigDto;
-  stopExceptions: StopExceptionDto[];
-}
+import { dataDtoSchema } from "./dataSchema";
+
+export type DataDto = z.infer<typeof dataDtoSchema>;

@@ -1,10 +1,10 @@
 import { memo } from "react";
 
 import { ResultsListItem } from "@/components/results-item";
-import { ConnectionDto } from "@/types/connectionDto";
+import { ConnectionResult } from "@/types/connectionResult";
 
 interface Props {
-  item: ConnectionDto;
+  item: ConnectionResult;
   fromName: string;
   toName: string;
 }
@@ -21,7 +21,7 @@ export const ConnectionListItem = memo(function ConnectionListItem({
       timeArrival={item.departureArrivalTimes.timeArrival}
       fromName={fromName}
       toName={toName}
-      departureDate={item.departureDate ?? new Date()}
+      departureDate={item.departureDate}
     />
   );
 });

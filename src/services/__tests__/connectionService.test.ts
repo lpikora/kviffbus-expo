@@ -97,10 +97,8 @@ describe("ConnectionService.searchConnections", () => {
     });
 
     expect(results).toHaveLength(2);
-    expect(results[0].fromName).toBe(thermalStop.name);
-    expect(results[0].toName).toBe(puppStop.name);
-    expect(results[0].departureDate?.getDate()).toBe(4);
-    expect(results[1].departureDate?.getDate()).toBe(5);
+    expect(results[0].departureDate.getDate()).toBe(4);
+    expect(results[1].departureDate.getDate()).toBe(5);
   });
 
   test("filters by from and to stops", () => {
@@ -127,7 +125,7 @@ describe("ConnectionService.searchConnections", () => {
     });
 
     expect(results).toHaveLength(1);
-    expect(results[0].departureDate?.getDate()).toBe(5);
+    expect(results[0].departureDate.getDate()).toBe(5);
   });
 
   test("keeps goesOnlyOn connections only on matching dates", () => {
@@ -180,7 +178,7 @@ describe("ConnectionService.searchConnections", () => {
     });
 
     expect(results.map((connection) => connection.id)).toEqual([2, 1, 2]);
-    expect(results[1].departureDate?.getDate()).toBe(5);
+    expect(results[1].departureDate.getDate()).toBe(5);
   });
 
   test("hides connections after operationsEndDate unless goesOnlyOn matches", () => {
@@ -258,7 +256,7 @@ describe("ConnectionService.searchConnections", () => {
     });
 
     expect(results).toHaveLength(1);
-    expect(results[0].departureDate?.getDate()).toBe(5);
+    expect(results[0].departureDate.getDate()).toBe(5);
   });
 });
 

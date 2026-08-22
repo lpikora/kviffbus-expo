@@ -1,15 +1,6 @@
-export interface ConnectionDto {
-  id: number;
-  lineId: string;
-  from: number;
-  fromName?: string;
-  to: number;
-  toName?: string;
-  departureDate?: Date;
-  departureArrivalTimes: { timeDeparture: number; timeArrival: number };
-  busNumber: string;
-  goesOnlyOn: string[];
-  notGoesOn: string[];
-}
+import { z } from "zod";
 
+import { connectionSchema } from "./dataSchema";
+
+export type ConnectionDto = z.infer<typeof connectionSchema>;
 export type ConnectionsMap = Record<string, ConnectionDto[]>;
