@@ -24,7 +24,7 @@ Fan-made app — not affiliated with KVIFF.
 
 Pick two festival stops, choose **now** or a later departure, and get **direct** shuttle connections with line, times, duration, and a live “in X minutes” label.
 
-The UI follows the device language (**Czech / English**). Last selected stops persist across launches. Timetables also power [kviffbus.cz](https://kviffbus.cz).
+The UI follows the device language (**Czech / English**). Last selected stops persist across launches.
 
 ## Highlights
 
