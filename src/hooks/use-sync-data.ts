@@ -5,41 +5,18 @@ import { toErrorCode } from "@/errors/appError";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 
-function waitForStoreHydration(persist: {
+export const SPLASH_HIDE_TIMEOUT_MS = 4_000;
+
+function whenHydrated(persist: {
   hasHydrated: () => boolean;
-  onFinishHydration: (fn: () => void) => () => void;
+  onFinishHydration: (fn: () => void) => void;
 }): Promise<void> {
   return new Promise((resolve) => {
+    persist.onFinishHydration(resolve);
     if (persist.hasHydrated()) {
       resolve();
-      return;
-    }
-
-    let settled = false;
-    let unsub = () => {};
-
-    const finish = () => {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      unsub();
-      resolve();
-    };
-
-    unsub = persist.onFinishHydration(finish);
-
-    if (persist.hasHydrated()) {
-      finish();
     }
   });
-}
-
-function waitForHydration(): Promise<void> {
-  return Promise.all([
-    waitForStoreHydration(useDataStore.persist),
-    waitForStoreHydration(useSearchStore.persist),
-  ]).then(() => undefined);
 }
 
 export const useInitData = () => {
@@ -48,11 +25,24 @@ export const useInitData = () => {
   const syncWithApi = useDataStore((state) => state.syncWithApi);
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      SplashScreen.hide();
+    }, SPLASH_HIDE_TIMEOUT_MS);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function prepare() {
       try {
-        await waitForHydration();
+        await Promise.all([
+          whenHydrated(useDataStore.persist),
+          whenHydrated(useSearchStore.persist),
+        ]);
         if (cancelled) {
           return;
         }
