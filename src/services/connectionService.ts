@@ -49,41 +49,43 @@ export class ConnectionService {
 
     const group = connections[connectionKey(fromStop.id, toStop.id)] ?? [];
 
-    const departureDayConnections = this.filterAndAnnotateConnections(
+    const sameDayResults = this.connectionResultsForDate(
       group,
-      this.getMinutesFromDate(departureDateTime),
+      this.minutesFromMidnight(departureDateTime),
       departureDateTime,
       appConfig,
     );
-    const nextDayFromDepartureDateTime = this.getNextDayDate(departureDateTime);
-    const departureNextDayConnections = this.filterAndAnnotateConnections(
+    const nextDay = this.nextDayAtMidnight(departureDateTime);
+    const nextDayResults = this.connectionResultsForDate(
       group,
       0,
-      nextDayFromDepartureDateTime,
+      nextDay,
       appConfig,
     );
 
-    return this.filterToStopExceptions(
-      departureDayConnections.concat(departureNextDayConnections),
+    return this.excludeStopExceptions(
+      sameDayResults.concat(nextDayResults),
       exceptions,
-      fromStop.name,
-      toStop.name,
+      fromStop.id,
+      toStop.id,
     );
   }
 
   private static hasStopException(
     exceptions: StopExceptionDto[],
-    stopName: string,
+    stopId: number,
     departureDate: Date,
   ) {
     for (const exception of exceptions) {
-      if (exception.stopName === stopName) {
-        const fromDate = new Date(exception.fromDate);
-        const fromTime = exception.fromTime.split(":");
-        fromDate.setHours(+fromTime[0], +fromTime[1]);
-        const toDate = new Date(exception.toDate);
-        const toTime = exception.toTime.split(":");
-        toDate.setHours(+toTime[0], +toTime[1]);
+      if (exception.id === stopId) {
+        const fromDate = this.dateWithMinutes(
+          new Date(exception.fromDate),
+          exception.fromTime,
+        );
+        const toDate = this.dateWithMinutes(
+          new Date(exception.toDate),
+          exception.toTime,
+        );
         if (departureDate > fromDate && departureDate < toDate) {
           return true;
         }
@@ -92,11 +94,11 @@ export class ConnectionService {
     return false;
   }
 
-  private static filterToStopExceptions(
+  private static excludeStopExceptions(
     connections: ConnectionResult[],
     exceptions: StopExceptionDto[],
-    fromStopName: string,
-    toStopName: string,
+    fromStopId: number,
+    toStopId: number,
   ): ConnectionResult[] {
     return connections.filter((connection) => {
       const arrivalDateTime = this.dateWithMinutes(
@@ -108,11 +110,11 @@ export class ConnectionService {
         connection.departureArrivalTimes.timeDeparture,
       );
 
-      if (this.hasStopException(exceptions, toStopName, arrivalDateTime)) {
+      if (this.hasStopException(exceptions, toStopId, arrivalDateTime)) {
         return false;
       }
 
-      if (this.hasStopException(exceptions, fromStopName, departureDateTime)) {
+      if (this.hasStopException(exceptions, fromStopId, departureDateTime)) {
         return false;
       }
 
@@ -120,45 +122,40 @@ export class ConnectionService {
     });
   }
 
-  private static filterAndAnnotateConnections(
+  private static connectionResultsForDate(
     group: ConnectionDto[],
     minDepartureMinutes: number,
     departureDateTime: Date,
     appConfig?: AppConfigDto | null,
-  ) {
-    const departureDate = this.getDateStringFromDate(departureDateTime);
+  ): ConnectionResult[] {
+    const dateKey = this.toDateKey(departureDateTime);
     const fromIndex = this.lowerBound(group, minDepartureMinutes);
 
-    const filteredConnections = [];
+    const matching: ConnectionDto[] = [];
     for (let index = fromIndex; index < group.length; index++) {
       const connection = group[index];
-      if (connection.notGoesOn.includes(departureDate)) {
+      if (connection.notGoesOn.includes(dateKey)) {
         continue;
       }
       if (
         connection.goesOnlyOn.length &&
-        !connection.goesOnlyOn.includes(departureDate)
+        !connection.goesOnlyOn.includes(dateKey)
       ) {
         continue;
       }
-      filteredConnections.push(connection);
+      matching.push(connection);
     }
 
-    const nonDuplicitConnections = filteredConnections.filter(
+    const uniqueByDeparture = matching.filter(
       (connection, index, array) =>
         !array[index - 1] ||
         connection.departureArrivalTimes.timeDeparture !==
           array[index - 1].departureArrivalTimes.timeDeparture,
     );
 
-    const connectionsWithDepartureDate = this.setDepartureDateOnConnections(
-      nonDuplicitConnections,
-      departureDateTime,
-    );
-
-    return this.filterConnectionAfterOperationsEndDate(
-      connectionsWithDepartureDate,
-      departureDate,
+    return this.excludeAfterOperationsEnd(
+      this.toConnectionResults(uniqueByDeparture, departureDateTime),
+      dateKey,
       appConfig,
     );
   }
@@ -183,11 +180,11 @@ export class ConnectionService {
     return lo;
   }
 
-  private static filterConnectionAfterOperationsEndDate(
+  private static excludeAfterOperationsEnd(
     connections: ConnectionResult[],
     departureDate: string,
     appConfig?: AppConfigDto | null,
-  ) {
+  ): ConnectionResult[] {
     if (appConfig && appConfig.operationsEndDate) {
       const operationsEndDate = new Date(appConfig.operationsEndDate);
       return connections.filter(
@@ -200,11 +197,11 @@ export class ConnectionService {
     }
   }
 
-  private static getMinutesFromDate(date: Date) {
+  private static minutesFromMidnight(date: Date) {
     return date.getHours() * 60 + date.getMinutes();
   }
 
-  private static getDateStringFromDate(date: Date) {
+  private static toDateKey(date: Date) {
     const year = date.getFullYear().toString();
     let month = (date.getMonth() + 1).toString();
     let day = date.getDate().toString();
@@ -226,23 +223,21 @@ export class ConnectionService {
     return date;
   }
 
-  private static setDepartureDateOnConnections(
+  private static toConnectionResults(
     connections: ConnectionDto[],
     desiredDepartureDate: Date,
   ): ConnectionResult[] {
-    return connections.map((connection) => {
-      return {
-        ...connection,
-        departureArrivalTimes: { ...connection.departureArrivalTimes },
-        departureDate: this.dateWithMinutes(
-          desiredDepartureDate,
-          connection.departureArrivalTimes.timeDeparture,
-        ),
-      };
-    });
+    return connections.map((connection) => ({
+      ...connection,
+      departureArrivalTimes: { ...connection.departureArrivalTimes },
+      departureDate: this.dateWithMinutes(
+        desiredDepartureDate,
+        connection.departureArrivalTimes.timeDeparture,
+      ),
+    }));
   }
 
-  private static getNextDayDate(date: Date) {
+  private static nextDayAtMidnight(date: Date) {
     const tomorrow = new Date(date);
     tomorrow.setDate(date.getDate() + 1);
     tomorrow.setHours(0);

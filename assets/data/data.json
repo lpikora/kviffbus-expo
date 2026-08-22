@@ -75,18 +75,18 @@
   ],
   "stopExceptions": [
     {
-      "stopName": "Hotel Thermal",
+      "id": 5,
       "fromDate": "2026-07-03",
-      "fromTime": "16:30",
+      "fromTime": 990,
       "toDate": "2026-07-04",
-      "toTime": "1:30"
+      "toTime": 90
     },
     {
-      "stopName": "Hotel Thermal",
+      "id": 5,
       "fromDate": "2026-07-11",
-      "fromTime": "16:30",
+      "fromTime": 990,
       "toDate": "2026-07-11",
-      "toTime": "19:00"
+      "toTime": 1140
     }
   ],
   "connections": {

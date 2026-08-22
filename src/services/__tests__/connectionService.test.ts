@@ -245,11 +245,11 @@ describe("ConnectionService.searchConnections", () => {
     const results = search({
       exceptions: [
         makeException({
-          stopName: thermalStop.name,
+          id: thermalStop.id,
           fromDate: "2026-07-04",
-          fromTime: "10:00",
+          fromTime: 600,
           toDate: "2026-07-04",
-          toTime: "14:00",
+          toTime: 840,
         }),
       ],
       date: new Date("2026-07-04T10:00:00"),

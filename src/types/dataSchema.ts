@@ -22,11 +22,11 @@ export const connectionSchema = z.object({
 });
 
 export const stopExceptionSchema = z.object({
-  stopName: z.string(),
+  id: z.number(),
   fromDate: z.string(),
-  fromTime: z.string(),
+  fromTime: z.number(),
   toDate: z.string(),
-  toTime: z.string(),
+  toTime: z.number(),
 });
 
 export const appConfigSchema = z.object({
