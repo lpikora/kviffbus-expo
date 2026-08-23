@@ -7,7 +7,7 @@ Unofficial offline-first finder for Karlovy Vary International Film Festival shu
 [![CI](https://img.shields.io/github/actions/workflow/status/lpikora/kviffbus-expo/ci.yml?style=flat-square&label=CI)](https://github.com/lpikora/kviffbus-expo/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-Fan-made app — not affiliated with KVIFF.
+The finder has been in use since **2022**. This repo is the current **native iOS and Android** app (Expo SDK 57). An [offline-first PWA](https://kviffbus.cz) was deployed for **KVIFF 2026**; the native app uses the same remote timetable feed (`data.json` / `version.json` on kviffbus.cz). Fan-made — not affiliated with KVIFF.
 
 <table>
   <tr>
@@ -22,17 +22,25 @@ Fan-made app — not affiliated with KVIFF.
 
 ## What it does
 
-Pick two festival stops, choose **now** or a later departure, and get **direct** shuttle connections with line, times, duration, and a live “in X minutes” label.
+Pick two festival stops, choose **now** or a later departure, and get **direct** shuttle connections with line, times, duration, and a live “in X minutes” label. Transfers are out of scope.
 
 The UI follows the device language (**Czech / English**). Last selected stops persist across launches.
 
+## Where to look first
+
+A 10-minute scan, in this order:
+
+1. [`src/stores/data-store.ts`](src/stores/data-store.ts) + [`src/hooks/use-sync-data.ts`](src/hooks/use-sync-data.ts) — bundled seed → MMKV → versioned sync; splash/hydration; interval + `AppState`
+2. [`src/types/dataSchema.ts`](src/types/dataSchema.ts) — Zod at the network boundary
+3. [`src/services/connection-service.ts`](src/services/connection-service.ts) + [`src/actions/run-connection-search.ts`](src/actions/run-connection-search.ts) — pure search; screens do not match connections
+4. [`src/components/date-time-picker/`](src/components/date-time-picker/) — iOS vs Android platform split
+5. [`src/app/_layout.tsx`](src/app/_layout.tsx) — Router shell, `ErrorBoundary`, `NativeTabs`
+
 ## Highlights
 
-- **Offline-first timetables.** Bundled [`assets/data/data.json`](assets/data/data.json) hydrates Zustand, persists to MMKV, then a background fetch applies only a newer `importVersion` — [`data-store.ts`](src/stores/data-store.ts), [`use-sync-data.ts`](src/hooks/use-sync-data.ts).
-- **Zod at the network boundary.** Remote JSON is `safeParse`d before it touches state — [`dataSchema.ts`](src/types/dataSchema.ts).
-- **Pure, tested search.** Binary search over sorted departures, date windows, stop exceptions, overnight arrivals — [`connection-service.ts`](src/services/connection-service.ts). Screens only call [`run-connection-search.ts`](src/actions/run-connection-search.ts).
-- **Expo Router as a product shell.** Route groups, `NativeTabs`, and modal sheets for stop picker and map.
-- **Platform-native datetime.** iOS Alert + modal vs Android two-step native picker — [`date-time-picker/index.tsx`](src/components/date-time-picker/index.tsx), [`index.android.tsx`](src/components/date-time-picker/index.android.tsx).
+- **Offline-first timetables.** Bundled [`assets/data/data.json`](assets/data/data.json) hydrates Zustand, persists to MMKV, then a background fetch applies only a newer `importVersion`.
+- **Zod at the network boundary.** Remote JSON is `safeParse`d before it touches state.
+- **Pure, tested search.** Binary search over sorted departures, date windows, stop exceptions, overnight arrivals.
 - **Typed errors → i18n.** Zustand persist for timetable data and last stops; `AppError` codes are translation keys.
 
 ## Architecture
@@ -52,7 +60,7 @@ flowchart LR
 
 ## Stack
 
-Expo SDK 57 · React Native 0.86 · React 19 · Expo Router · Zustand + MMKV · Zod · i18next · Jest + React Native Testing Library · EAS
+Expo SDK 57 · React Native 0.86 · React 19 · Expo Router (typed routes) · Zustand + MMKV · Zod · i18next · Jest + React Native Testing Library · EAS · React Compiler (experimental)
 
 ## Run locally
 
