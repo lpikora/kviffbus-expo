@@ -1,14 +1,22 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView, StyleSheet } from "react-native";
+import {
+  FlatList,
+  ListRenderItemInfo,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { StopPickerItem } from "@/components/stop-picker-item";
-import { MaxContentWidth, space } from "@/constants/theme";
+import { space } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 import { StopDto, TypeOfStopType } from "@/types/stopDto";
 import { parseStopField } from "@/utils/parse-stop-field";
+
+const keyExtractor = (item: StopDto) => String(item.id);
 
 export default function StopPickerScreen() {
   const { field: fieldParam } = useLocalSearchParams<{
@@ -32,39 +40,39 @@ export default function StopPickerScreen() {
   const setFromStop = useSearchStore((state) => state.setFromStop);
   const setToStop = useSearchStore((state) => state.setToStop);
 
-  const handleSelect = 
-    (stop: StopDto) => {
-      if (field === "from") {
-        setFromStop(stop);
-      } else if (field === "to") {
-        setToStop(stop);
-      }
-      router.back();
+  const handleSelect = (stop: StopDto) => {
+    if (field === "from") {
+      setFromStop(stop);
+    } else if (field === "to") {
+      setToStop(stop);
     }
+    router.back();
+  };
+
+  const renderItem = ({ item }: ListRenderItemInfo<StopDto>) => (
+    <StopPickerItem
+      stop={item}
+      selected={item.id === selectedStopId}
+      onPress={() => handleSelect(item)}
+    />
+  );
+
+  const screenBg = { backgroundColor: theme.colors.bg };
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.bg }]}
-      contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled"
-      contentInset={{ bottom: insets.bottom }}
-      contentContainerStyle={[
-        styles.list,
-        {
-          paddingTop: space[8],
-          paddingBottom: insets.bottom + space[64],
-        },
-      ]}
-    >
-      {stops.map((stop) => (
-        <StopPickerItem
-          key={stop.id}
-          stop={stop}
-          selected={stop.id === selectedStopId}
-          onPress={() => handleSelect(stop)}
-        />
-      ))}
-    </ScrollView>
+    <View style={[styles.container, screenBg]}>
+      <FlatList
+        data={stops}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={12}
+        maxToRenderPerBatch={8}
+        windowSize={7}
+        removeClippedSubviews={Platform.OS === "android"}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
   );
 }
 
@@ -72,12 +80,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  list: {
-    paddingHorizontal: space[24],
-    gap: space[8],
-    alignItems: "center",
-    maxWidth: MaxContentWidth,
-    alignSelf: "center",
-    width: "100%",
+  listContent: {
+    paddingVertical: space[8],
+    flexGrow: 1,
   },
 });

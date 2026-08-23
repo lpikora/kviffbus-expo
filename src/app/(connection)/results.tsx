@@ -68,11 +68,14 @@ export default function ResultsScreen() {
   );
   const visibleResults = queryMatches ? results : [];
 
-  function renderItem({ item }: ListRenderItemInfo<ConnectionResult>) {
-    return (
-      <ConnectionListItem item={item} fromName={fromName} toName={toName} now={now}/>
-    );
-  }
+  const renderItem = ({ item }: ListRenderItemInfo<ConnectionResult>) => (
+    <ConnectionListItem
+      item={item}
+      fromName={fromName}
+      toName={toName}
+      now={now}
+    />
+  );
 
   const screenBg = { backgroundColor: theme.colors.bg };
 

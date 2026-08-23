@@ -50,6 +50,8 @@ const styles = StyleSheet.create({
   },
   stopCard: {
     padding: space[16],
+    marginHorizontal: space[16],
+    marginVertical: space[2],
     borderRadius: radius.md,
   },
 });
