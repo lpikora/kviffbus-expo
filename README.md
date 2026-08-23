@@ -7,7 +7,7 @@ Unofficial offline-first finder for Karlovy Vary International Film Festival shu
 [![CI](https://img.shields.io/github/actions/workflow/status/lpikora/kviffbus-expo/ci.yml?style=flat-square&label=CI)](https://github.com/lpikora/kviffbus-expo/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-The finder has been in use since **2022**. This repo is the current **native iOS and Android** app (Expo SDK 57). An [offline-first PWA](https://kviffbus.cz) was deployed for **KVIFF 2026**; the native app uses the same remote timetable feed (`data.json` / `version.json` on kviffbus.cz). Fan-made — not affiliated with KVIFF.
+The finder has been in use since **2022**. This repo is the current **native iOS and Android** app (Expo SDK 57). Timetables come from a remote feed (`data.json` / `version.json` on [kviffbus.cz](https://kviffbus.cz)). Fan-made — not affiliated with KVIFF.
 
 <table>
   <tr>

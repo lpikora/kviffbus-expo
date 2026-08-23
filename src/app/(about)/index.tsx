@@ -1,14 +1,7 @@
 import Constants from "expo-constants";
 import { Href } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  Alert,
-  Linking,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Alert, Linking, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppPressable } from "@/components/app-pressable";
@@ -26,6 +19,15 @@ export default function AboutScreen() {
   const appConfig = useDataStore((state) => state.appConfig);
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
 
+  const contentPlatformStyle =
+    Platform.OS === "android"
+      ? {
+          paddingLeft: safeAreaInsets.left,
+          paddingRight: safeAreaInsets.right,
+          paddingBottom: bottomInset,
+        }
+      : undefined;
+
   const openContactEmail = async (email: string) => {
     const url = `mailto:${email}`;
     try {
@@ -38,15 +40,6 @@ export default function AboutScreen() {
       Alert.alert(t("App.Contact"), t("App.cannotOpenEmail"));
     }
   };
-
-  const contentPlatformStyle =
-    Platform.OS === "android"
-      ? {
-          paddingLeft: safeAreaInsets.left,
-          paddingRight: safeAreaInsets.right,
-          paddingBottom: bottomInset,
-        }
-      : undefined;
 
   return (
     <ScrollView
