@@ -99,15 +99,25 @@ describe("getDataVersionUrl", () => {
   });
 });
 
+function setDev(value: boolean) {
+  Object.defineProperty(globalThis, "__DEV__", {
+    value,
+    configurable: true,
+  });
+}
+
 describe("getRemoteData", () => {
   const originalFetch = globalThis.fetch;
+  const originalDev = __DEV__;
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    setDev(originalDev);
     jest.restoreAllMocks();
   });
 
   test("parses a valid remote payload", async () => {
+    setDev(false);
     const payload = makeDataDto();
     const fetchMock = mockFetch(async () => ({
       ok: true,
@@ -122,6 +132,7 @@ describe("getRemoteData", () => {
   });
 
   test("uses the provided data URL", async () => {
+    setDev(false);
     const payload = makeDataDto();
     const fetchMock = mockFetch(async () => ({
       ok: true,
@@ -137,6 +148,7 @@ describe("getRemoteData", () => {
   });
 
   test("throws DataLoadFailed on HTTP error", async () => {
+    setDev(false);
     mockFetch(async () => ({
       ok: false,
     }));
@@ -148,6 +160,7 @@ describe("getRemoteData", () => {
   });
 
   test("throws DataLoadFailed when the payload fails the schema", async () => {
+    setDev(false);
     mockFetch(async () => ({
       ok: true,
       json: async () => ({ broken: true }),
@@ -160,6 +173,7 @@ describe("getRemoteData", () => {
   });
 
   test("throws DataLoadFailed when fetch rejects", async () => {
+    setDev(false);
     mockFetch(async () => {
       throw new Error("network down");
     });
@@ -171,6 +185,7 @@ describe("getRemoteData", () => {
   });
 
   test("throws DataLoadFailed when the request is aborted", async () => {
+    setDev(false);
     mockFetch(async () => {
       throw new DOMException("The operation was aborted.", "AbortError");
     });
@@ -184,13 +199,16 @@ describe("getRemoteData", () => {
 
 describe("getRemoteDataVersion", () => {
   const originalFetch = globalThis.fetch;
+  const originalDev = __DEV__;
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    setDev(originalDev);
     jest.restoreAllMocks();
   });
 
   test("parses a valid remote version payload without caching", async () => {
+    setDev(false);
     const fetchMock = mockFetch(async () => ({
       ok: true,
       json: async () => ({ importVersion: "2026.4" }),
@@ -217,6 +235,7 @@ describe("getRemoteDataVersion", () => {
   });
 
   test("uses a version URL derived from the provided data URL", async () => {
+    setDev(false);
     const fetchMock = mockFetch(async () => ({
       ok: true,
       json: async () => ({ importVersion: "2026.4" }),
@@ -233,6 +252,7 @@ describe("getRemoteDataVersion", () => {
   });
 
   test("throws DataLoadFailed on HTTP error", async () => {
+    setDev(false);
     mockFetch(async () => ({
       ok: false,
     }));
@@ -244,6 +264,7 @@ describe("getRemoteDataVersion", () => {
   });
 
   test("throws DataLoadFailed when the payload fails the schema", async () => {
+    setDev(false);
     mockFetch(async () => ({
       ok: true,
       json: async () => ({ broken: true }),

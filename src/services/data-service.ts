@@ -90,12 +90,25 @@ function withCacheBust(url: string): string {
 export async function getRemoteData(
   dataUrl: string = DEFAULT_DATA_URL,
 ): Promise<DataDto> {
+  // API JSON is not finished yet — mock remote data from bundled local data in development.
+  if (__DEV__) {
+    return parseDataDto(await getLocalData());
+  }
+
   return parseDataDto(await fetchJson(dataUrl));
 }
 
 export async function getRemoteDataVersion(
   dataUrl: string = DEFAULT_DATA_URL,
 ): Promise<DataVersionDto> {
+  // API JSON is not finished yet — mock remote version from bundled local data in development.
+  if (__DEV__) {
+    const localData = await getLocalData();
+    return parseDataVersionDto({
+      importVersion: localData.appConfig.importVersion,
+    });
+  }
+
   return parseDataVersionDto(
     await fetchJson(withCacheBust(getDataVersionUrl(dataUrl)), NO_CACHE_INIT),
   );
