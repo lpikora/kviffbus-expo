@@ -7,6 +7,7 @@ import {
 } from "@/services/data-service";
 import { ErrorCode } from "@/types/appError";
 
+import bundledData from "../../../assets/data/data.json";
 import { makeDataDto } from "./fixtures";
 
 function mockFetch(
@@ -58,6 +59,14 @@ describe("parseDataDto", () => {
     expect(parsed.connections[key][0]).not.toHaveProperty("fromName");
     expect(parsed.connections[key][0]).not.toHaveProperty("toName");
     expect(parsed.connections[key][0]).not.toHaveProperty("departureDate");
+  });
+});
+
+describe("getLocalData", () => {
+  test("bundled assets/data/data.json matches DataDto", () => {
+    expect(() =>
+      parseDataDto(getJsonModulePayload(bundledData)),
+    ).not.toThrow();
   });
 });
 

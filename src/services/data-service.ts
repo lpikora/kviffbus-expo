@@ -28,7 +28,7 @@ export function getJsonModulePayload(module: unknown): unknown {
 
 export async function getLocalData(): Promise<DataDto> {
   const localData = await import("../../assets/data/data.json");
-  return parseDataDto(getJsonModulePayload(localData));
+  return getJsonModulePayload(localData) as DataDto;
 }
 
 export async function getRemoteData(
