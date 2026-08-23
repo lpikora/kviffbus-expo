@@ -1,10 +1,6 @@
-import Constants from "expo-constants";
+import * as Application from "expo-application";
 
-export const APP_BUILD_NUMBER = Number(
-  Constants.expoConfig?.android?.versionCode ??
-    Constants.expoConfig?.ios?.buildNumber ??
-    1,
-);
+export const APP_BUILD_NUMBER = Number(Application.nativeBuildVersion ?? 1);
 
 export function discardPersistedOnVersionBump<T>(fresh: T) {
   return {
