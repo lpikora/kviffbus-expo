@@ -25,6 +25,7 @@ export default function AboutScreen() {
           paddingLeft: safeAreaInsets.left,
           paddingRight: safeAreaInsets.right,
           paddingBottom: bottomInset,
+          paddingTop: safeAreaInsets.top + space[16],
         }
       : undefined;
 
