@@ -32,18 +32,6 @@ export function parseDataVersionDto(data: unknown): DataVersionDto {
   return result.data;
 }
 
-export function getJsonModulePayload(module: unknown): unknown {
-  if (
-    typeof module === "object" &&
-    module !== null &&
-    "default" in module &&
-    (module as { default: unknown }).default !== undefined
-  ) {
-    return (module as { default: unknown }).default;
-  }
-  return module;
-}
-
 export function getDataVersionUrl(dataUrl: string = DEFAULT_DATA_URL): string {
   try {
     const url = new URL(dataUrl);
@@ -58,8 +46,10 @@ export function getDataVersionUrl(dataUrl: string = DEFAULT_DATA_URL): string {
 }
 
 export async function getLocalData(): Promise<DataDto> {
-  const localData = await import("../../assets/data/data.json");
-  return getJsonModulePayload(localData) as DataDto;
+  const localData = (await import("../../assets/data/data.json")) as {
+    default: DataDto;
+  };
+  return localData.default;
 }
 
 async function fetchJson(url: string, init: RequestInit = {}): Promise<unknown> {

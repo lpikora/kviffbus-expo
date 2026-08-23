@@ -3,7 +3,6 @@ import {
   DEFAULT_DATA_URL,
   DEFAULT_DATA_VERSION_URL,
   getDataVersionUrl,
-  getJsonModulePayload,
   getRemoteData,
   getRemoteDataVersion,
   parseDataDto,
@@ -66,11 +65,9 @@ describe("parseDataDto", () => {
   });
 });
 
-describe("getLocalData", () => {
-  test("bundled assets/data/data.json matches DataDto", () => {
-    expect(() =>
-      parseDataDto(getJsonModulePayload(bundledData)),
-    ).not.toThrow();
+describe("bundled data", () => {
+  test("assets/data/data.json matches DataDto", () => {
+    expect(() => parseDataDto(bundledData)).not.toThrow();
   });
 });
 
@@ -274,19 +271,5 @@ describe("getRemoteDataVersion", () => {
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
-  });
-});
-
-describe("getJsonModulePayload", () => {
-  test("returns a raw JSON module unchanged", () => {
-    const payload = makeDataDto();
-
-    expect(getJsonModulePayload(payload)).toEqual(payload);
-  });
-
-  test("unwraps a default-exported JSON module", () => {
-    const payload = makeDataDto();
-
-    expect(getJsonModulePayload({ default: payload })).toEqual(payload);
   });
 });
