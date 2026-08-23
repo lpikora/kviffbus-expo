@@ -1,4 +1,8 @@
-import { getLocalData, getRemoteData } from "@/services/data-service";
+import {
+  getLocalData,
+  getRemoteData,
+  getRemoteDataVersion,
+} from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
 import { discardPersistedOnVersionBump } from "@/stores/persist-version";
 import { useSearchStore } from "@/stores/search-store";
@@ -51,18 +55,22 @@ export const useDataStore = create<DataStore>()(
       syncWithApi: async () => {
         try {
           const { appConfig: currentAppConfig } = get();
-          const remoteData = await getRemoteData(currentAppConfig?.dataUrl);
+          const remoteVersion = await getRemoteDataVersion(
+            currentAppConfig?.dataUrl,
+          );
 
           if (
             currentAppConfig !== null &&
             !isNewerImportVersion(
-              remoteData.appConfig.importVersion,
+              remoteVersion.importVersion,
               currentAppConfig.importVersion,
             )
           ) {
             clearStaleLoadError();
             return;
           }
+
+          const remoteData = await getRemoteData(currentAppConfig?.dataUrl);
 
           set({
             stops: remoteData.stops,

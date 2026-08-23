@@ -9,7 +9,11 @@ import {
   useInitData,
 } from "@/hooks/use-sync-data";
 import { makeAppConfig, makeDataDto } from "@/services/__tests__/fixtures";
-import { getLocalData, getRemoteData } from "@/services/data-service";
+import {
+  getLocalData,
+  getRemoteData,
+  getRemoteDataVersion,
+} from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
 import { createMemoryStorage } from "@/stores/__tests__/memory-storage";
 import { useDataStore } from "@/stores/data-store";
@@ -30,12 +34,16 @@ jest.mock("@/services/storage", () => {
 jest.mock("@/services/data-service", () => ({
   getLocalData: jest.fn(),
   getRemoteData: jest.fn(),
+  getRemoteDataVersion: jest.fn(),
 }));
 
 const memoryStorage = clientStorage as ReturnType<typeof createMemoryStorage>;
 const getLocalDataMock = getLocalData as jest.MockedFunction<typeof getLocalData>;
 const getRemoteDataMock = getRemoteData as jest.MockedFunction<
   typeof getRemoteData
+>;
+const getRemoteDataVersionMock = getRemoteDataVersion as jest.MockedFunction<
+  typeof getRemoteDataVersion
 >;
 const hideSplash = SplashScreen.hide as jest.Mock;
 
@@ -58,6 +66,9 @@ describe("useInitData", () => {
     appStateListeners.length = 0;
     getLocalDataMock.mockReset().mockResolvedValue(bundled);
     getRemoteDataMock.mockReset().mockResolvedValue(bundled);
+    getRemoteDataVersionMock.mockReset().mockResolvedValue({
+      importVersion: bundled.appConfig.importVersion,
+    });
     jest.spyOn(console, "warn").mockImplementation(() => {});
     jest.spyOn(AppState, "addEventListener").mockImplementation((_event, handler) => {
       appStateListeners.push(handler);
@@ -92,8 +103,9 @@ describe("useInitData", () => {
       expect(hideSplash).toHaveBeenCalledTimes(1);
     });
     await waitFor(() => {
-      expect(getRemoteDataMock).toHaveBeenCalled();
+      expect(getRemoteDataVersionMock).toHaveBeenCalled();
     });
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
     expect(useSearchStore.getState().error).toBeNull();
   });
 
@@ -119,6 +131,7 @@ describe("useInitData", () => {
     });
 
     expect(hideSplash).not.toHaveBeenCalled();
+    expect(getRemoteDataVersionMock).not.toHaveBeenCalled();
     expect(getRemoteDataMock).not.toHaveBeenCalled();
   });
 
@@ -138,6 +151,7 @@ describe("useInitData", () => {
         jest.advanceTimersByTime(1);
       });
       expect(hideSplash).toHaveBeenCalledTimes(1);
+      expect(getRemoteDataVersionMock).not.toHaveBeenCalled();
       expect(getRemoteDataMock).not.toHaveBeenCalled();
     } finally {
       jest.useRealTimers();
@@ -158,6 +172,7 @@ describe("useInitData", () => {
 
       expect(hideSplash).toHaveBeenCalledTimes(1);
       expect(getLocalDataMock).not.toHaveBeenCalled();
+      expect(getRemoteDataVersionMock).not.toHaveBeenCalled();
       expect(getRemoteDataMock).not.toHaveBeenCalled();
     } finally {
       jest.useRealTimers();
@@ -183,6 +198,9 @@ describe("useInitData", () => {
       expect(hideSplash).toHaveBeenCalledTimes(1);
     });
     await waitFor(() => {
+      expect(getRemoteDataVersionMock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
       expect(getRemoteDataMock).toHaveBeenCalled();
     });
     expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
@@ -203,6 +221,9 @@ describe("useInitData", () => {
     await renderHook(() => useInitData());
 
     await waitFor(() => {
+      expect(getRemoteDataVersionMock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
       expect(getRemoteDataMock).toHaveBeenCalled();
     });
     expect(useSearchStore.getState().error).toBe(ErrorCode.DataLoadFailed);
@@ -212,7 +233,7 @@ describe("useInitData", () => {
     await renderHook(() => useInitData());
 
     await waitFor(() => {
-      expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+      expect(getRemoteDataVersionMock).toHaveBeenCalledTimes(1);
     });
 
     await act(async () => {
@@ -220,7 +241,8 @@ describe("useInitData", () => {
       emitAppState("active");
     });
 
-    expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+    expect(getRemoteDataVersionMock).toHaveBeenCalledTimes(1);
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
   });
 
   test("syncs again on resume after the interval elapses", async () => {
@@ -230,7 +252,7 @@ describe("useInitData", () => {
     await renderHook(() => useInitData());
 
     await waitFor(() => {
-      expect(getRemoteDataMock).toHaveBeenCalledTimes(1);
+      expect(getRemoteDataVersionMock).toHaveBeenCalledTimes(1);
     });
 
     jest.spyOn(Date, "now").mockImplementation(() => startedAt + SYNC_INTERVAL_MS);
@@ -241,7 +263,8 @@ describe("useInitData", () => {
     });
 
     await waitFor(() => {
-      expect(getRemoteDataMock).toHaveBeenCalledTimes(2);
+      expect(getRemoteDataVersionMock).toHaveBeenCalledTimes(2);
     });
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
   });
 });

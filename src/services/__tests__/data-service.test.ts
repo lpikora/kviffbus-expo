@@ -1,9 +1,13 @@
 import { AppError } from "@/errors/appError";
 import {
   DEFAULT_DATA_URL,
+  DEFAULT_DATA_VERSION_URL,
+  getDataVersionUrl,
   getJsonModulePayload,
   getRemoteData,
+  getRemoteDataVersion,
   parseDataDto,
+  parseDataVersionDto,
 } from "@/services/data-service";
 import { ErrorCode } from "@/types/appError";
 
@@ -67,6 +71,31 @@ describe("getLocalData", () => {
     expect(() =>
       parseDataDto(getJsonModulePayload(bundledData)),
     ).not.toThrow();
+  });
+});
+
+describe("parseDataVersionDto", () => {
+  test("accepts a valid version payload", () => {
+    expect(parseDataVersionDto({ importVersion: "2026.4" })).toEqual({
+      importVersion: "2026.4",
+    });
+  });
+
+  test("rejects a payload that fails the schema", () => {
+    expect(() => parseDataVersionDto({})).toThrow(AppError);
+  });
+});
+
+describe("getDataVersionUrl", () => {
+  test("replaces the data file with version.json", () => {
+    expect(getDataVersionUrl(DEFAULT_DATA_URL)).toBe(DEFAULT_DATA_VERSION_URL);
+    expect(getDataVersionUrl("https://example.com/remote.json")).toBe(
+      "https://example.com/version.json",
+    );
+  });
+
+  test("falls back to the default version URL for an invalid data URL", () => {
+    expect(getDataVersionUrl("not-a-url")).toBe(DEFAULT_DATA_VERSION_URL);
   });
 });
 
@@ -147,6 +176,80 @@ describe("getRemoteData", () => {
     });
 
     await expect(getRemoteData()).rejects.toMatchObject({
+      name: "AppError",
+      code: ErrorCode.DataLoadFailed,
+    });
+  });
+});
+
+describe("getRemoteDataVersion", () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    jest.restoreAllMocks();
+  });
+
+  test("parses a valid remote version payload without caching", async () => {
+    const fetchMock = mockFetch(async () => ({
+      ok: true,
+      json: async () => ({ importVersion: "2026.4" }),
+    }));
+
+    await expect(getRemoteDataVersion()).resolves.toEqual({
+      importVersion: "2026.4",
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringMatching(
+        new RegExp(
+          `^${DEFAULT_DATA_VERSION_URL.replaceAll(".", "\\.")}\\?_=\\d+$`,
+        ),
+      ),
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+        cache: "no-store",
+        headers: expect.objectContaining({
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+        }),
+      }),
+    );
+  });
+
+  test("uses a version URL derived from the provided data URL", async () => {
+    const fetchMock = mockFetch(async () => ({
+      ok: true,
+      json: async () => ({ importVersion: "2026.4" }),
+    }));
+
+    await getRemoteDataVersion("https://example.com/custom.json");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^https:\/\/example\.com\/version\.json\?_=\d+$/,
+      ),
+      expect.objectContaining({ cache: "no-store" }),
+    );
+  });
+
+  test("throws DataLoadFailed on HTTP error", async () => {
+    mockFetch(async () => ({
+      ok: false,
+    }));
+
+    await expect(getRemoteDataVersion()).rejects.toMatchObject({
+      name: "AppError",
+      code: ErrorCode.DataLoadFailed,
+    });
+  });
+
+  test("throws DataLoadFailed when the payload fails the schema", async () => {
+    mockFetch(async () => ({
+      ok: true,
+      json: async () => ({ broken: true }),
+    }));
+
+    await expect(getRemoteDataVersion()).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });

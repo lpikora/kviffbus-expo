@@ -4,7 +4,11 @@ import {
   puppStop,
   thermalStop,
 } from "@/services/__tests__/fixtures";
-import { getLocalData, getRemoteData } from "@/services/data-service";
+import {
+  getLocalData,
+  getRemoteData,
+  getRemoteDataVersion,
+} from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
 import { connectionKey } from "@/utils/connection-key";
 
@@ -18,6 +22,7 @@ jest.mock("@/services/storage", () => {
 jest.mock("@/services/data-service", () => ({
   getLocalData: jest.fn(),
   getRemoteData: jest.fn(),
+  getRemoteDataVersion: jest.fn(),
 }));
 
 import { dataStoreDefaultValues, useDataStore } from "@/stores/data-store";
@@ -29,6 +34,9 @@ const memoryStorage = clientStorage as ReturnType<typeof createMemoryStorage>;
 const getLocalDataMock = getLocalData as jest.MockedFunction<typeof getLocalData>;
 const getRemoteDataMock = getRemoteData as jest.MockedFunction<
   typeof getRemoteData
+>;
+const getRemoteDataVersionMock = getRemoteDataVersion as jest.MockedFunction<
+  typeof getRemoteDataVersion
 >;
 
 const bundled = makeDataDto({
@@ -67,6 +75,7 @@ describe("useDataStore", () => {
     memoryStorage.store.clear();
     getLocalDataMock.mockReset();
     getRemoteDataMock.mockReset();
+    getRemoteDataVersionMock.mockReset();
     jest.spyOn(console, "warn").mockImplementation(() => {});
     useDataStore.getState().reset();
     useSearchStore.getState().reset();
@@ -126,10 +135,16 @@ describe("useDataStore", () => {
 
   test("syncWithApi applies remote data only when importVersion is newer", async () => {
     seedPersisted(bundled);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
     getRemoteDataMock.mockResolvedValue(remoteNewer);
 
     await useDataStore.getState().syncWithApi();
 
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(
+      bundled.appConfig.dataUrl,
+    );
     expect(getRemoteDataMock).toHaveBeenCalledWith(bundled.appConfig.dataUrl);
     expect(useDataStore.getState().appConfig?.importVersion).toBe("2026.4");
     expect(useDataStore.getState().stops[0].name).toBe("Remote Thermal");
@@ -137,16 +152,36 @@ describe("useDataStore", () => {
 
   test("syncWithApi skips remote data with an older importVersion", async () => {
     seedPersisted(persistedNewer);
-    getRemoteDataMock.mockResolvedValue(remoteNewer);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
 
     await useDataStore.getState().syncWithApi();
 
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(
+      persistedNewer.appConfig.dataUrl,
+    );
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
     expect(useDataStore.getState().appConfig?.importVersion).toBe("2026.5");
     expect(useDataStore.getState().stops[0].name).toBe("Persisted Thermal");
   });
 
-  test("syncWithApi keeps current data when remote fetch fails", async () => {
+  test("syncWithApi keeps current data when remote version fetch fails", async () => {
     seedPersisted(bundled);
+    getRemoteDataVersionMock.mockRejectedValue(new Error("offline"));
+
+    await useDataStore.getState().syncWithApi();
+
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
+    expect(useDataStore.getState().appConfig?.importVersion).toBe("2026.2");
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  test("syncWithApi keeps current data when remote data fetch fails", async () => {
+    seedPersisted(bundled);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
     getRemoteDataMock.mockRejectedValue(new Error("offline"));
 
     await useDataStore.getState().syncWithApi();
@@ -166,6 +201,9 @@ describe("useDataStore", () => {
 
   test("syncWithApi clears a stale load error after a successful fetch", async () => {
     useSearchStore.getState().setError(ErrorCode.DataLoadFailed);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
     getRemoteDataMock.mockResolvedValue(remoteNewer);
 
     await useDataStore.getState().syncWithApi();
@@ -176,15 +214,21 @@ describe("useDataStore", () => {
   test("syncWithApi clears a stale load error when remote data is already current", async () => {
     seedPersisted(bundled);
     useSearchStore.getState().setError(ErrorCode.Unknown);
-    getRemoteDataMock.mockResolvedValue(bundled);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: bundled.appConfig.importVersion,
+    });
 
     await useDataStore.getState().syncWithApi();
 
+    expect(getRemoteDataMock).not.toHaveBeenCalled();
     expect(useSearchStore.getState().error).toBeNull();
   });
 
   test("syncWithApi leaves search errors and load errors after a failed fetch", async () => {
     useSearchStore.getState().setError(ErrorCode.MissingStops);
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
     getRemoteDataMock.mockResolvedValue(remoteNewer);
 
     await useDataStore.getState().syncWithApi();
@@ -192,7 +236,7 @@ describe("useDataStore", () => {
     expect(useSearchStore.getState().error).toBe(ErrorCode.MissingStops);
 
     useSearchStore.getState().setError(ErrorCode.DataLoadFailed);
-    getRemoteDataMock.mockRejectedValue(new Error("offline"));
+    getRemoteDataVersionMock.mockRejectedValue(new Error("offline"));
 
     await useDataStore.getState().syncWithApi();
 
@@ -219,10 +263,14 @@ describe("useDataStore", () => {
   });
 
   test("syncWithApi applies remote data when persist has no appConfig", async () => {
+    getRemoteDataVersionMock.mockResolvedValue({
+      importVersion: remoteNewer.appConfig.importVersion,
+    });
     getRemoteDataMock.mockResolvedValue(remoteNewer);
 
     await useDataStore.getState().syncWithApi();
 
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(undefined);
     expect(getRemoteDataMock).toHaveBeenCalledWith(undefined);
     expect(useDataStore.getState().connections).toEqual(
       remoteNewer.connections,

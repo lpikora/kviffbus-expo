@@ -52,3 +52,7 @@ export const dataDtoSchema = z.object({
   stopExceptions: z.array(stopExceptionSchema),
   appConfig: appConfigSchema,
 });
+
+export const dataVersionDtoSchema = z.object({
+  importVersion: z.string(),
+});
