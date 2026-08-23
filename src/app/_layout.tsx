@@ -1,4 +1,5 @@
 import { SplashScreen, ThemeProvider } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { I18nextProvider } from "react-i18next";
 
 import AppTabs from "@/components/app-tabs";
@@ -19,6 +20,7 @@ export default function TabLayout() {
   return (
     <I18nextProvider i18n={i18n}>
       <ThemeProvider value={toNavigationTheme(theme)}>
+        <StatusBar style={theme.scheme === "dark" ? "light" : "dark"} />
         <AppTabs />
       </ThemeProvider>
     </I18nextProvider>
