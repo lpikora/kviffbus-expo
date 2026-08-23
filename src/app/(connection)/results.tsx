@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -6,7 +7,6 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
 import { runConnectionSearch } from "@/actions/run-connection-search";
@@ -19,6 +19,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useDataStore } from "@/stores/data-store";
 import { useSearchStore } from "@/stores/search-store";
 import { ConnectionResult } from "@/types/connectionResult";
+import { useMinuteNow } from "@/utils/minute-clock";
 import {
   resultsHaveStaleImport,
   resultsMatchQuery,
@@ -51,6 +52,8 @@ export default function ResultsScreen() {
     })),
   );
 
+  const now = useMinuteNow();
+
   const importVersion = useDataStore(
     (state) => state.appConfig?.importVersion ?? "",
   );
@@ -67,7 +70,7 @@ export default function ResultsScreen() {
 
   function renderItem({ item }: ListRenderItemInfo<ConnectionResult>) {
     return (
-      <ConnectionListItem item={item} fromName={fromName} toName={toName} />
+      <ConnectionListItem item={item} fromName={fromName} toName={toName} now={now}/>
     );
   }
 

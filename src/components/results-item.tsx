@@ -19,6 +19,7 @@ interface Props {
   fromName: string;
   toName: string;
   departureDate: Date;
+  now: Date;
 }
 
 export const ResultsListItem = memo(function ResultsListItem({
@@ -28,9 +29,10 @@ export const ResultsListItem = memo(function ResultsListItem({
   fromName,
   toName,
   departureDate,
+  now,
 }: Props) {
   const theme = useTheme();
-  const timeToDeparture = useTimeToDepartureLabel(departureDate);
+  const timeToDeparture = useTimeToDepartureLabel(departureDate, now);
   const durationTime = getDurationBetweenTwoTimes(timeDeparture, timeArrival);
   const departureLabel = formatMinutesToHhMm(timeDeparture);
   const arrivalLabel = formatMinutesToHhMm(timeArrival);

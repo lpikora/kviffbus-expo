@@ -14,13 +14,12 @@ export function formatMinutesToHhMm(minutes: number) {
   return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
 }
 
-export function getDateTimeStringFromNowToDate(date: Date) {
-  const nowDate = new Date();
-  const seconds = (date.getTime() - nowDate.getTime()) / 1000;
+export function getDateTimeStringFromNowToDate(now: Date, date: Date) {
+  const seconds = (date.getTime() - now.getTime()) / 1000;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
 
-  if (toDateKey(nowDate) !== toDateKey(date)) {
+  if (toDateKey(now) !== toDateKey(date)) {
     return dayjs(date).calendar(undefined, {
       lastDay: i18n.t("calendarTranslations.lastDay"),
       sameDay: i18n.t("calendarTranslations.sameDay"),
@@ -32,7 +31,7 @@ export function getDateTimeStringFromNowToDate(date: Date) {
   }
 
   if (h <= 0) {
-    return dayjs().to(date);
+    return dayjs(now).to(date);
   }
 
   if (m === 0) {

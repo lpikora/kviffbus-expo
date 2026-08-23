@@ -34,10 +34,12 @@ describe("toDateKey", () => {
 });
 
 describe("getDateTimeStringFromNowToDate", () => {
+  const now = new Date(2026, 6, 4, 10, 0, 0);
+
   beforeEach(() => {
     void i18n.changeLanguage("en");
     jest.useFakeTimers();
-    jest.setSystemTime(new Date(2026, 6, 4, 10, 0, 0));
+    jest.setSystemTime(now);
   });
 
   afterEach(() => {
@@ -46,31 +48,31 @@ describe("getDateTimeStringFromNowToDate", () => {
 
   test("formats a same-day departure more than an hour away", () => {
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 12, 5, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 4, 12, 5, 0)),
     ).toBe(`${i18n.t("time.in")} 2 h 5 min`);
   });
 
   test("omits minutes when a same-day departure is an exact number of hours away", async () => {
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 11, 0, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 4, 11, 0, 0)),
     ).toBe(`${i18n.t("time.in")} 1 h`);
 
     await i18n.changeLanguage("cs");
 
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 11, 0, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 4, 11, 0, 0)),
     ).toBe("za 1 h");
   });
 
   test("uses a calendar string for another day", () => {
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 5, 12, 0, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 5, 12, 0, 0)),
     ).toBe("Tomorrow at 12:00");
   });
 
   test("uses relative time for a same-day departure under an hour", () => {
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 4, 10, 30, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 4, 10, 30, 0)),
     ).toBe("in 30 minutes");
   });
 
@@ -78,7 +80,7 @@ describe("getDateTimeStringFromNowToDate", () => {
     await i18n.changeLanguage("cs");
 
     expect(
-      getDateTimeStringFromNowToDate(new Date(2026, 6, 5, 12, 0, 0)),
+      getDateTimeStringFromNowToDate(now, new Date(2026, 6, 5, 12, 0, 0)),
     ).toBe("Zítra v 12:00");
   });
 });

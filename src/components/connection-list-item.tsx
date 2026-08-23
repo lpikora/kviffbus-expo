@@ -7,12 +7,14 @@ interface Props {
   item: ConnectionResult;
   fromName: string;
   toName: string;
+  now: Date;
 }
 
 export const ConnectionListItem = memo(function ConnectionListItem({
   item,
   fromName,
   toName,
+  now,
 }: Props) {
   return (
     <ResultsListItem
@@ -22,6 +24,7 @@ export const ConnectionListItem = memo(function ConnectionListItem({
       fromName={fromName}
       toName={toName}
       departureDate={item.departureDate}
+      now={now}
     />
   );
 });
