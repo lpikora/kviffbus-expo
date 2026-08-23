@@ -4,9 +4,11 @@ import { DataDto } from "@/types/dataDto";
 import { dataDtoSchema, dataVersionDtoSchema } from "@/types/dataSchema";
 import { DataVersionDto } from "@/types/dataVersionDto";
 
-export const DEFAULT_DATA_URL = "https://kviffbus.cz/data/data.json";
-export const DEFAULT_DATA_VERSION_URL = "https://kviffbus.cz/data/version.json";
+export const REMOTE_DATA_BASE_URL = "https://lpikora.github.io/kviffbus-expo/";
+export const REMOTE_DATA_VERSION_FILE = "version.json";
+export const DEFAULT_DATA_VERSION_URL = `${REMOTE_DATA_BASE_URL}${REMOTE_DATA_VERSION_FILE}`;
 const FETCH_TIMEOUT_MS = 10_000;
+const IMPORT_VERSION_PATTERN = /^[0-9A-Za-z._-]+$/;
 
 const NO_CACHE_INIT: RequestInit = {
   cache: "no-store",
@@ -32,17 +34,12 @@ export function parseDataVersionDto(data: unknown): DataVersionDto {
   return result.data;
 }
 
-export function getDataVersionUrl(dataUrl: string = DEFAULT_DATA_URL): string {
-  try {
-    const url = new URL(dataUrl);
-    const segments = url.pathname.split("/");
-    segments[segments.length - 1] = "version.json";
-    url.pathname = segments.join("/");
-    url.search = "";
-    return url.toString();
-  } catch {
-    return DEFAULT_DATA_VERSION_URL;
+export function getRemoteDataUrl(importVersion: string): string {
+  if (!IMPORT_VERSION_PATTERN.test(importVersion)) {
+    throw new AppError(ErrorCode.DataLoadFailed);
   }
+
+  return `${REMOTE_DATA_BASE_URL}data-${importVersion}.json`;
 }
 
 export async function getLocalData(): Promise<DataDto> {
@@ -77,29 +74,12 @@ function withCacheBust(url: string): string {
   return `${url}${separator}_=${Date.now()}`;
 }
 
-export async function getRemoteData(
-  dataUrl: string = DEFAULT_DATA_URL,
-): Promise<DataDto> {
-  // API JSON is not finished yet — mock remote data from bundled local data in development.
-  if (__DEV__) {
-    return parseDataDto(await getLocalData());
-  }
-
+export async function getRemoteData(dataUrl: string): Promise<DataDto> {
   return parseDataDto(await fetchJson(dataUrl));
 }
 
-export async function getRemoteDataVersion(
-  dataUrl: string = DEFAULT_DATA_URL,
-): Promise<DataVersionDto> {
-  // API JSON is not finished yet — mock remote version from bundled local data in development.
-  if (__DEV__) {
-    const localData = await getLocalData();
-    return parseDataVersionDto({
-      importVersion: localData.appConfig.importVersion,
-    });
-  }
-
+export async function getRemoteDataVersion(): Promise<DataVersionDto> {
   return parseDataVersionDto(
-    await fetchJson(withCacheBust(getDataVersionUrl(dataUrl)), NO_CACHE_INIT),
+    await fetchJson(withCacheBust(DEFAULT_DATA_VERSION_URL), NO_CACHE_INIT),
   );
 }

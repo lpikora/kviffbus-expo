@@ -7,6 +7,7 @@ import {
 import {
   getLocalData,
   getRemoteData,
+  getRemoteDataUrl,
   getRemoteDataVersion,
 } from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
@@ -19,11 +20,15 @@ jest.mock("@/services/storage", () => {
   return { clientStorage: createMemoryStorage() };
 });
 
-jest.mock("@/services/data-service", () => ({
-  getLocalData: jest.fn(),
-  getRemoteData: jest.fn(),
-  getRemoteDataVersion: jest.fn(),
-}));
+jest.mock("@/services/data-service", () => {
+  const actual = jest.requireActual("@/services/data-service") as typeof import("@/services/data-service");
+  return {
+    ...actual,
+    getLocalData: jest.fn(),
+    getRemoteData: jest.fn(),
+    getRemoteDataVersion: jest.fn(),
+  };
+});
 
 import { dataStoreDefaultValues, useDataStore } from "@/stores/data-store";
 import { APP_BUILD_NUMBER } from "@/stores/persist-version";
@@ -142,10 +147,10 @@ describe("useDataStore", () => {
 
     await useDataStore.getState().syncWithApi();
 
-    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(
-      bundled.appConfig.dataUrl,
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith();
+    expect(getRemoteDataMock).toHaveBeenCalledWith(
+      getRemoteDataUrl(remoteNewer.appConfig.importVersion),
     );
-    expect(getRemoteDataMock).toHaveBeenCalledWith(bundled.appConfig.dataUrl);
     expect(useDataStore.getState().appConfig?.importVersion).toBe("2026.4");
     expect(useDataStore.getState().stops[0].name).toBe("Remote Thermal");
   });
@@ -158,9 +163,7 @@ describe("useDataStore", () => {
 
     await useDataStore.getState().syncWithApi();
 
-    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(
-      persistedNewer.appConfig.dataUrl,
-    );
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith();
     expect(getRemoteDataMock).not.toHaveBeenCalled();
     expect(useDataStore.getState().appConfig?.importVersion).toBe("2026.5");
     expect(useDataStore.getState().stops[0].name).toBe("Persisted Thermal");
@@ -270,8 +273,10 @@ describe("useDataStore", () => {
 
     await useDataStore.getState().syncWithApi();
 
-    expect(getRemoteDataVersionMock).toHaveBeenCalledWith(undefined);
-    expect(getRemoteDataMock).toHaveBeenCalledWith(undefined);
+    expect(getRemoteDataVersionMock).toHaveBeenCalledWith();
+    expect(getRemoteDataMock).toHaveBeenCalledWith(
+      getRemoteDataUrl(remoteNewer.appConfig.importVersion),
+    );
     expect(useDataStore.getState().connections).toEqual(
       remoteNewer.connections,
     );

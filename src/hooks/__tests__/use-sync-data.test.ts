@@ -31,11 +31,15 @@ jest.mock("@/services/storage", () => {
   return { clientStorage: createMemoryStorage() };
 });
 
-jest.mock("@/services/data-service", () => ({
-  getLocalData: jest.fn(),
-  getRemoteData: jest.fn(),
-  getRemoteDataVersion: jest.fn(),
-}));
+jest.mock("@/services/data-service", () => {
+  const actual = jest.requireActual("@/services/data-service") as typeof import("@/services/data-service");
+  return {
+    ...actual,
+    getLocalData: jest.fn(),
+    getRemoteData: jest.fn(),
+    getRemoteDataVersion: jest.fn(),
+  };
+});
 
 const memoryStorage = clientStorage as ReturnType<typeof createMemoryStorage>;
 const getLocalDataMock = getLocalData as jest.MockedFunction<typeof getLocalData>;

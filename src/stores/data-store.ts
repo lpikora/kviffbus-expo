@@ -1,6 +1,7 @@
 import {
   getLocalData,
   getRemoteData,
+  getRemoteDataUrl,
   getRemoteDataVersion,
 } from "@/services/data-service";
 import { clientStorage } from "@/services/storage";
@@ -55,9 +56,7 @@ export const useDataStore = create<DataStore>()(
       syncWithApi: async () => {
         try {
           const { appConfig: currentAppConfig } = get();
-          const remoteVersion = await getRemoteDataVersion(
-            currentAppConfig?.dataUrl,
-          );
+          const remoteVersion = await getRemoteDataVersion();
 
           if (
             currentAppConfig !== null &&
@@ -70,7 +69,9 @@ export const useDataStore = create<DataStore>()(
             return;
           }
 
-          const remoteData = await getRemoteData(currentAppConfig?.dataUrl);
+          const remoteData = await getRemoteData(
+            getRemoteDataUrl(remoteVersion.importVersion),
+          );
 
           set({
             stops: remoteData.stops,

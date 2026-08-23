@@ -1,9 +1,8 @@
 import { AppError } from "@/errors/appError";
 import {
-  DEFAULT_DATA_URL,
   DEFAULT_DATA_VERSION_URL,
-  getDataVersionUrl,
   getRemoteData,
+  getRemoteDataUrl,
   getRemoteDataVersion,
   parseDataDto,
   parseDataVersionDto,
@@ -83,53 +82,43 @@ describe("parseDataVersionDto", () => {
   });
 });
 
-describe("getDataVersionUrl", () => {
-  test("replaces the data file with version.json", () => {
-    expect(getDataVersionUrl(DEFAULT_DATA_URL)).toBe(DEFAULT_DATA_VERSION_URL);
-    expect(getDataVersionUrl("https://example.com/remote.json")).toBe(
-      "https://example.com/version.json",
+describe("getRemoteDataUrl", () => {
+  test("builds a versioned data snapshot URL from the remote base", () => {
+    expect(getRemoteDataUrl("2026.2")).toBe(
+      "https://lpikora.github.io/kviffbus-expo/data-2026.2.json",
     );
   });
 
-  test("falls back to the default version URL for an invalid data URL", () => {
-    expect(getDataVersionUrl("not-a-url")).toBe(DEFAULT_DATA_VERSION_URL);
+  test("rejects an unsafe importVersion", () => {
+    expect(() => getRemoteDataUrl("../secret")).toThrow(AppError);
+    expect(() => getRemoteDataUrl("2026/2")).toThrow(AppError);
   });
 });
 
-function setDev(value: boolean) {
-  Object.defineProperty(globalThis, "__DEV__", {
-    value,
-    configurable: true,
-  });
-}
-
 describe("getRemoteData", () => {
   const originalFetch = globalThis.fetch;
-  const originalDev = __DEV__;
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    setDev(originalDev);
     jest.restoreAllMocks();
   });
 
   test("parses a valid remote payload", async () => {
-    setDev(false);
     const payload = makeDataDto();
     const fetchMock = mockFetch(async () => ({
       ok: true,
       json: async () => payload,
     }));
 
-    await expect(getRemoteData()).resolves.toEqual(payload);
+    const dataUrl = getRemoteDataUrl("2026.2");
+    await expect(getRemoteData(dataUrl)).resolves.toEqual(payload);
     expect(fetchMock).toHaveBeenCalledWith(
-      DEFAULT_DATA_URL,
+      dataUrl,
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 
   test("uses the provided data URL", async () => {
-    setDev(false);
     const payload = makeDataDto();
     const fetchMock = mockFetch(async () => ({
       ok: true,
@@ -145,49 +134,45 @@ describe("getRemoteData", () => {
   });
 
   test("throws DataLoadFailed on HTTP error", async () => {
-    setDev(false);
     mockFetch(async () => ({
       ok: false,
     }));
 
-    await expect(getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData(getRemoteDataUrl("2026.2"))).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
   });
 
   test("throws DataLoadFailed when the payload fails the schema", async () => {
-    setDev(false);
     mockFetch(async () => ({
       ok: true,
       json: async () => ({ broken: true }),
     }));
 
-    await expect(getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData(getRemoteDataUrl("2026.2"))).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
   });
 
   test("throws DataLoadFailed when fetch rejects", async () => {
-    setDev(false);
     mockFetch(async () => {
       throw new Error("network down");
     });
 
-    await expect(getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData(getRemoteDataUrl("2026.2"))).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
   });
 
   test("throws DataLoadFailed when the request is aborted", async () => {
-    setDev(false);
     mockFetch(async () => {
       throw new DOMException("The operation was aborted.", "AbortError");
     });
 
-    await expect(getRemoteData()).rejects.toMatchObject({
+    await expect(getRemoteData(getRemoteDataUrl("2026.2"))).rejects.toMatchObject({
       name: "AppError",
       code: ErrorCode.DataLoadFailed,
     });
@@ -196,16 +181,13 @@ describe("getRemoteData", () => {
 
 describe("getRemoteDataVersion", () => {
   const originalFetch = globalThis.fetch;
-  const originalDev = __DEV__;
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    setDev(originalDev);
     jest.restoreAllMocks();
   });
 
   test("parses a valid remote version payload without caching", async () => {
-    setDev(false);
     const fetchMock = mockFetch(async () => ({
       ok: true,
       json: async () => ({ importVersion: "2026.4" }),
@@ -231,25 +213,7 @@ describe("getRemoteDataVersion", () => {
     );
   });
 
-  test("uses a version URL derived from the provided data URL", async () => {
-    setDev(false);
-    const fetchMock = mockFetch(async () => ({
-      ok: true,
-      json: async () => ({ importVersion: "2026.4" }),
-    }));
-
-    await getRemoteDataVersion("https://example.com/custom.json");
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringMatching(
-        /^https:\/\/example\.com\/version\.json\?_=\d+$/,
-      ),
-      expect.objectContaining({ cache: "no-store" }),
-    );
-  });
-
   test("throws DataLoadFailed on HTTP error", async () => {
-    setDev(false);
     mockFetch(async () => ({
       ok: false,
     }));
@@ -261,7 +225,6 @@ describe("getRemoteDataVersion", () => {
   });
 
   test("throws DataLoadFailed when the payload fails the schema", async () => {
-    setDev(false);
     mockFetch(async () => ({
       ok: true,
       json: async () => ({ broken: true }),
