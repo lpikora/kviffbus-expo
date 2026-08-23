@@ -30,6 +30,8 @@ export default {
   results: {
     noResults:
       "No connections found. (Application can find only direct connections.)",
+    timetableUpdated: "Timetables have been updated.",
+    refresh: "Refresh",
   },
   time: {
     in: "in",

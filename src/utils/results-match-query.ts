@@ -26,3 +26,10 @@ export function resultsMatchQuery(
     sameDepartureDate(resultsQuery.departureDate, departureDateTime.date)
   );
 }
+
+export function resultsHaveStaleImport(
+  resultsQuery: ResultsQuery | null,
+  importVersion: string,
+) {
+  return resultsQuery != null && resultsQuery.importVersion !== importVersion;
+}

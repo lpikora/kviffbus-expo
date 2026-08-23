@@ -16,6 +16,7 @@ export interface ResultsQuery {
   toStopId: number;
   departureType: TypeOfDepartureDateTimeType;
   departureDate: Date | null;
+  importVersion: string;
 }
 
 export interface SearchStoreState {

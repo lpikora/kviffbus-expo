@@ -1,5 +1,8 @@
 import { TypeOfDepartureDateTimeType } from "@/types/departureDateTimeType";
-import { resultsMatchQuery } from "@/utils/results-match-query";
+import {
+  resultsHaveStaleImport,
+  resultsMatchQuery,
+} from "@/utils/results-match-query";
 
 const now = {
   type: TypeOfDepartureDateTimeType.now,
@@ -16,6 +19,7 @@ const query = {
   toStopId: 2,
   departureType: TypeOfDepartureDateTimeType.now,
   departureDate: null,
+  importVersion: "2026.2",
 };
 
 describe("resultsMatchQuery", () => {
@@ -55,5 +59,25 @@ describe("resultsMatchQuery", () => {
     expect(resultsMatchQuery(undefined, 2, now, query)).toBe(false);
     expect(resultsMatchQuery(1, undefined, now, query)).toBe(false);
     expect(resultsMatchQuery(1, 2, now, null)).toBe(false);
+  });
+
+  test("still matches when importVersion differs", () => {
+    expect(
+      resultsMatchQuery(1, 2, now, { ...query, importVersion: "2026.4" }),
+    ).toBe(true);
+  });
+});
+
+describe("resultsHaveStaleImport", () => {
+  test("is true when the stored importVersion differs", () => {
+    expect(resultsHaveStaleImport(query, "2026.4")).toBe(true);
+  });
+
+  test("is false when importVersion matches", () => {
+    expect(resultsHaveStaleImport(query, "2026.2")).toBe(false);
+  });
+
+  test("is false when resultsQuery is null", () => {
+    expect(resultsHaveStaleImport(null, "2026.2")).toBe(false);
   });
 });

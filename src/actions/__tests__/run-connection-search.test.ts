@@ -66,6 +66,7 @@ describe("runConnectionSearch", () => {
       toStopId: puppStop.id,
       departureType: state.departureDateTime.type,
       departureDate: state.departureDateTime.date,
+      importVersion: "2026.2",
     });
     expect(state.isLoading).toBe(false);
     expect(state.error).toBeNull();
@@ -89,6 +90,7 @@ describe("runConnectionSearch", () => {
       toStopId: puppStop.id,
       departureType: TypeOfDepartureDateTimeType.dateTime,
       departureDate: date,
+      importVersion: "2026.2",
     });
   });
 
@@ -109,6 +111,7 @@ describe("runConnectionSearch", () => {
       toStopId: puppStop.id,
       departureType: state.departureDateTime.type,
       departureDate: state.departureDateTime.date,
+      importVersion: "2026.2",
     });
     expect(state.isLoading).toBe(false);
   });
@@ -138,5 +141,16 @@ describe("runConnectionSearch", () => {
     expect(useSearchStore.getState().resultsQuery).toBeNull();
     expect(useSearchStore.getState().error).toBe(ErrorCode.MissingStops);
     expect(useSearchStore.getState().results).toEqual([]);
+  });
+
+  test("stamps an empty importVersion when appConfig is missing", () => {
+    useDataStore.setState({ appConfig: null });
+    useSearchStore.getState().setFromStop(thermalStop);
+    useSearchStore.getState().setToStop(puppStop);
+    searchConnectionsMock.mockReturnValue([searchResult]);
+
+    runConnectionSearch();
+
+    expect(useSearchStore.getState().resultsQuery?.importVersion).toBe("");
   });
 });

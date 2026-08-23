@@ -17,6 +17,7 @@ export function runConnectionSearch() {
           toStopId,
           departureType: departureDateTime.type,
           departureDate: departureDateTime.date,
+          importVersion: appConfig?.importVersion ?? "",
         }
       : null;
 

@@ -31,6 +31,8 @@ export default {
   results: {
     noResults:
       "Nebylo nalezeno žádné spojení. (Aplikace umí hledat pouze přímá spojení.)",
+    timetableUpdated: "Jízdní řády byly aktualizovány.",
+    refresh: "Obnovit",
   },
   time: {
     in: "za",

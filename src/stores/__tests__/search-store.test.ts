@@ -51,6 +51,7 @@ describe("useSearchStore", () => {
         toStopId: puppStop.id,
         departureType: TypeOfDepartureDateTimeType.now,
         departureDate: null,
+        importVersion: "2026.2",
       },
       error: ErrorCode.SearchFailed,
     });
@@ -73,6 +74,7 @@ describe("useSearchStore", () => {
         toStopId: 2,
         departureType: TypeOfDepartureDateTimeType.now,
         departureDate: null,
+        importVersion: "2026.2",
       },
       error: ErrorCode.Unknown,
     });
@@ -91,6 +93,7 @@ describe("useSearchStore", () => {
         toStopId: 2,
         departureType: TypeOfDepartureDateTimeType.now,
         departureDate: null,
+        importVersion: "2026.2",
       },
     });
 
@@ -108,6 +111,7 @@ describe("useSearchStore", () => {
         toStopId: 2,
         departureType: TypeOfDepartureDateTimeType.now,
         departureDate: null,
+        importVersion: "2026.2",
       },
       error: ErrorCode.Unknown,
     });
@@ -130,6 +134,7 @@ describe("useSearchStore", () => {
         toStopId: 2,
         departureType: TypeOfDepartureDateTimeType.dateTime,
         departureDate: null,
+        importVersion: "2026.2",
       },
     });
 
@@ -150,6 +155,7 @@ describe("useSearchStore", () => {
       toStopId: 2,
       departureType: TypeOfDepartureDateTimeType.now,
       departureDate: null,
+      importVersion: "2026.2",
     };
     useSearchStore.setState({
       results: [sampleResult],
