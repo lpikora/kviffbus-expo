@@ -54,6 +54,7 @@ export default {
     AppVersion: "version",
     TimetablesVersion: "timetables",
     Contact: "Contact",
+    cannotOpenEmail: "Could not open the mail app.",
   },
   InfoBanner: {
     title: "About the App",

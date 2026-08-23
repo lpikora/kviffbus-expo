@@ -55,6 +55,7 @@ export default {
     AppVersion: "verze",
     TimetablesVersion: "jízdní řády",
     Contact: "Kontakt",
+    cannotOpenEmail: "Nepodařilo se otevřít e-mailovou aplikaci.",
   },
   InfoBanner: {
     title: "O aplikaci",
