@@ -7,7 +7,7 @@ Unofficial offline-first finder for Karlovy Vary International Film Festival shu
 [![CI](https://img.shields.io/github/actions/workflow/status/lpikora/kviffbus-expo/ci.yml?style=flat-square&label=CI)](https://github.com/lpikora/kviffbus-expo/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-The finder has been in use since **2022**. This repo is the current **native iOS and Android** app (Expo SDK 57). Timetables come from a remote feed (`data.json` / `version.json` on [kviffbus.cz](https://kviffbus.cz)). Fan-made — not affiliated with KVIFF.
+The finder has been in production since **2022** ([kviffbus.cz](https://kviffbus.cz)). This repository is a **rewrite** of that existing app onto Expo SDK 57 (native iOS and Android) — same product and timetable domain, cleaned-up architecture. Timetables come from a remote feed (`data.json` / `version.json`). Fan-made — not affiliated with KVIFF.
 
 <table>
   <tr>
@@ -19,6 +19,10 @@ The finder has been in use since **2022**. This repo is the current **native iOS
     <td><img src="screenshots/results.png" alt="Connection results grouped by time to departure, lines F1 and F2" width="280" /></td>
   </tr>
 </table>
+
+## About this rewrite
+
+KVIFF Bus already shipped for several festival seasons: stop search, direct F1/F2/F3 matching, and an offline-first remote timetable feed. This repo is not a new product; it is that app rewritten on the current Expo stack so the architecture is easier to read — screens stay thin, sync lives in the store, connection matching is a pure service, and the network boundary is validated with Zod.
 
 ## What it does
 
