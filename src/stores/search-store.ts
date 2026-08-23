@@ -1,0 +1,118 @@
+import { clientStorage } from "@/services/storage";
+import { ErrorCode } from "@/types/appError";
+import { ConnectionResult } from "@/types/connectionResult";
+import {
+  DepartureDateTimeType,
+  TypeOfDepartureDateTimeType,
+} from "@/types/departureDateTimeType";
+import { StopDto } from "@/types/stopDto";
+import { discardPersistedOnVersionBump } from "@/stores/persist-version";
+
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+export interface ResultsQuery {
+  fromStopId: number;
+  toStopId: number;
+  departureType: TypeOfDepartureDateTimeType;
+  departureDate: Date | null;
+  importVersion: string;
+}
+
+export interface SearchStoreState {
+  fromStop: StopDto | null;
+  toStop: StopDto | null;
+  departureDateTime: DepartureDateTimeType;
+  results: ConnectionResult[];
+  resultsQuery: ResultsQuery | null;
+  isLoading: boolean;
+  error: ErrorCode | null;
+}
+
+export interface SearchStoreActions {
+  setFromStop: (stop: StopDto | null) => void;
+  setToStop: (stop: StopDto | null) => void;
+  setDepartureDateTime: (
+    departureDateTime: Partial<DepartureDateTimeType>,
+  ) => void;
+  setError: (error: ErrorCode | null) => void;
+  swapStops: () => void;
+  reset: () => void;
+}
+
+export type SearchStore = SearchStoreState & SearchStoreActions;
+
+export const searchStoreDefaultValues: SearchStoreState = {
+  fromStop: null,
+  toStop: null,
+  departureDateTime: {
+    type: TypeOfDepartureDateTimeType.now,
+    date: null,
+  },
+  results: [],
+  resultsQuery: null,
+  isLoading: false,
+  error: null,
+};
+
+export const useSearchStore = create<SearchStore>()(
+  persist(
+    (set) => ({
+      ...searchStoreDefaultValues,
+      setFromStop: (fromStop) =>
+        set({
+          fromStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
+        }),
+      setToStop: (toStop) =>
+        set({
+          toStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
+        }),
+      setDepartureDateTime: (departureDateTime) =>
+        set((state) => {
+          const nextDepartureDateTime = {
+            ...state.departureDateTime,
+            ...departureDateTime,
+          };
+          const sameType =
+            nextDepartureDateTime.type === state.departureDateTime.type;
+          const sameDate =
+            nextDepartureDateTime.date?.getTime() ===
+            state.departureDateTime.date?.getTime();
+          if (sameType && sameDate) {
+            return { departureDateTime: nextDepartureDateTime };
+          }
+          return {
+            departureDateTime: nextDepartureDateTime,
+            results: [],
+            resultsQuery: null,
+            error: null,
+          };
+        }),
+      setError: (error) => set({ error }),
+      swapStops: () =>
+        set((state) => ({
+          fromStop: state.toStop,
+          toStop: state.fromStop,
+          results: [],
+          resultsQuery: null,
+          error: null,
+        })),
+      reset: () => set(searchStoreDefaultValues),
+    }),
+    {
+      name: "kviffbus-search",
+      ...discardPersistedOnVersionBump(searchStoreDefaultValues),
+      storage: createJSONStorage(() => clientStorage),
+      partialize: (state) => ({
+        fromStop: state.fromStop,
+        toStop: state.toStop,
+      }),
+    },
+  ),
+);

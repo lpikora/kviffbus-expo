@@ -1,0 +1,98 @@
+{
+  "name": "kviffbus-expo",
+  "main": "expo-router/entry",
+  "version": "1.0.0",
+  "dependencies": {
+    "@react-native-community/datetimepicker": "9.1.0",
+    "dayjs": "^1.11.23",
+    "expo": "~57.0.14",
+    "expo-application": "~57.0.2",
+    "expo-asset": "~57.0.13",
+    "expo-constants": "~57.0.12",
+    "expo-font": "~57.0.1",
+    "expo-image": "~57.0.3",
+    "expo-linking": "~57.0.6",
+    "expo-localization": "^57.0.1",
+    "expo-router": "~57.0.14",
+    "expo-splash-screen": "~57.0.7",
+    "expo-web-browser": "~57.0.2",
+    "i18next": "^26.3.6",
+    "lucide-react-native": "^1.33.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-i18next": "^17.0.11",
+    "react-native": "0.86.2",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-mmkv": "^4.3.2",
+    "react-native-nitro-modules": "^0.36.5",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.10.1",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "@types/jest": "29.5.14",
+    "@types/node": "^26.2.0",
+    "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "gh-pages": "^6.3.0",
+    "husky": "^9.1.7",
+    "jest": "~29.7.0",
+    "jest-expo": "~57.0.4",
+    "lint-staged": "^17.3.0",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "android:clean": "expo run:android --clean",
+    "ios": "expo run:ios",
+    "ios:prebuild": "expo prebuild --platform ios",
+    "android:prebuild": "expo prebuild --platform android",
+    "web": "expo start --web",
+    "lint": "expo lint",
+    "test": "jest --watchAll",
+    "test:ci": "jest --watchAll=false --coverage=false",
+    "test:related": "jest --bail --findRelatedTests --passWithNoTests --coverage=false",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky",
+    "prepare:remote-data": "node scripts/prepare-remote-data.mjs",
+    "deploy:remote-data": "npm run prepare:remote-data && gh-pages -d remote-data --add --nojekyll"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|lucide-react-native)"
+    ],
+    "moduleNameMapper": {
+      "^lucide-react-native$": "<rootDir>/node_modules/lucide-react-native/dist/cjs/lucide-react-native.js"
+    },
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/src/services/__tests__/fixtures.ts",
+      "<rootDir>/src/stores/__tests__/memory-storage.ts"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "npm run lint",
+      "npm run test:related"
+    ],
+    "*.{ts,tsx}": [
+      "node -e \"const { execSync } = require('child_process'); execSync('tsc --noEmit', { stdio: 'inherit' });\""
+    ]
+  },
+  "private": true
+}
